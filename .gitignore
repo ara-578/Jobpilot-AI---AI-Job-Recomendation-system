@@ -6,3 +6,5 @@ db.sqlite3
 .env
 media/
 staticfiles/
+Resume.csv
+postings.csv
