@@ -1,0 +1,64 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% block title %}Manage your profile{% endblock %}
+{% block content %}
+<section class="page-hero">
+  <div class="container profile-page-heading">
+    <div><div class="eyebrow">YOUR PROFESSIONAL PRESENCE</div><h1>Manage Your Profile</h1><p class="muted mb-0">Keep your professional information up to date.</p></div>
+    <a class="btn btn-outline-primary rounded-pill" href="{% url 'dashboard' %}">Cancel</a>
+  </div>
+</section>
+<div class="container page-content profile-workspace">
+  <aside class="profile-progress-panel panel">
+    <div class="profile-avatar">
+      {% if profile.profile_image %}<img src="{{ profile.profile_image.url }}" alt="Your profile photo" data-profile-avatar><span data-profile-avatar-fallback hidden>{{ user.first_name|default:user.username|slice:":1"|upper }}</span>
+      {% else %}<span>{{ user.first_name|default:user.username|slice:":1"|upper }}</span>{% endif %}
+    </div>
+    <h2>{{ user.get_full_name|default:user.username }}</h2>
+    <p class="muted">{{ profile.headline|default:"Add a headline to introduce yourself." }}</p>
+    <div class="d-flex justify-content-between align-items-center"><strong>Profile completeness</strong><strong>{{ profile_completion }}%</strong></div>
+    <div class="progress mt-2" role="progressbar" aria-label="Profile completeness" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ profile_completion }}"><div class="progress-bar" style="width:{{ profile_completion }}%"></div></div>
+    {% if missing_profile_fields %}<h3 class="mt-4">Add these details</h3><ul class="profile-missing-list">{% for missing in missing_profile_fields %}<li>{{ missing }}</li>{% endfor %}</ul>{% else %}<p class="text-success small mt-3 mb-0">Your profile has all tracked details.</p>{% endif %}
+  </aside>
+  <main>
+    {% if form.non_field_errors %}<div class="alert alert-danger" role="alert">{{ form.non_field_errors }}</div>{% endif %}
+    <form method="post" enctype="multipart/form-data" data-submit-once>
+      {% csrf_token %}
+      {% for section in profile_sections %}
+        <section class="panel profile-form-section">
+          <div class="section-kicker">PROFILE SETTINGS</div><h2>{{ section.title }}</h2>
+          <div class="row g-3">
+            {% for field in section.fields %}
+              <div class="col-md-{% if field.name == 'career_summary' or field.name == 'company_description' or field.name == 'skills' %}12{% else %}6{% endif %}">
+                {% if field.name == "profile_image" %}
+                  <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                  {{ field }}{% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
+                  {% for error in field.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                  <div class="form-text">PNG, JPEG or WebP, up to 2 MB. Leave empty to keep your current photo.</div>
+                  <img class="profile-upload-preview mt-2{% if not profile.profile_image %} d-none{% endif %}" data-profile-image-preview src="{% if profile.profile_image %}{{ profile.profile_image.url }}{% endif %}" alt="Selected profile photo preview">
+                {% elif field.name == "skills" %}
+                  <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                  <div class="skill-editor" data-skill-editor>
+                    {{ field }}
+                    <div class="d-flex gap-2 mt-2"><input class="form-control" type="text" data-skill-entry placeholder="Add a skill" aria-label="Add a skill"><button class="btn btn-outline-primary rounded-pill" type="button" data-add-skill>Add skill</button></div>
+                    <div class="skill-cloud mt-3" data-skill-tags aria-live="polite"></div>
+                  </div>
+                  {% for error in field.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                {% else %}
+                  <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                  {{ field }}{% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
+                  {% for error in field.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                {% endif %}
+              </div>
+            {% endfor %}
+          </div>
+        </section>
+      {% endfor %}
+      <div class="profile-form-actions">
+        <a class="btn btn-outline-secondary rounded-pill px-4" href="{% url 'dashboard' %}">Cancel</a>
+        <button class="btn btn-primary rounded-pill px-4" type="submit" data-submit-label="Save changes">Save changes</button>
+      </div>
+    </form>
+  </main>
+</div>
+{% endblock %}

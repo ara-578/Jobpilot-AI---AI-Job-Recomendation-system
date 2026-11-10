@@ -1,0 +1,28 @@
+{% extends "core/base.html" %}
+{% block title %}Resume preview{% endblock %}
+{% block content %}
+<section class="page-hero">
+  <div class="container">
+    <div class="eyebrow">ATS RESUME</div>
+    <h1>{{ builder.full_name }}{% if builder.target_job_title %} · {{ builder.target_job_title }}{% endif %}</h1>
+    <p class="muted mb-0">Review the generated PDF before downloading or updating your resume.</p>
+  </div>
+</section>
+<div class="container page-content">
+  <div class="d-flex flex-wrap gap-2 mb-3">
+    <a class="btn btn-primary rounded-pill" href="{% url 'resume_builder_download' builder.id %}">Download PDF</a>
+    <a class="btn btn-outline-primary rounded-pill" href="{% url 'resume_builder' %}">Edit resume</a>
+    <button class="btn btn-outline-secondary rounded-pill" type="button" data-pdf-zoom="out" aria-label="Zoom out">−</button>
+    <button class="btn btn-outline-secondary rounded-pill" type="button" data-pdf-zoom="in" aria-label="Zoom in">+</button>
+    <label class="visually-hidden" for="resume-pdf-page">PDF page</label>
+    <input class="form-control resume-pdf-page" id="resume-pdf-page" type="number" min="1" value="1" data-pdf-page>
+  </div>
+  <iframe
+    title="PDF preview of {{ builder.full_name }}'s resume"
+    src="{% url 'resume_builder_pdf' builder.id %}?v={{ builder.updated_at|date:'U' }}#page=1&zoom=100"
+    class="w-100 border rounded"
+    style="height: min(78vh, 1000px); min-height: 520px"
+    data-pdf-frame
+  ></iframe>
+</div>
+{% endblock %}

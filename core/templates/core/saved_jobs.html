@@ -1,0 +1,22 @@
+{% extends 'core/base.html' %}
+{% block title %}Saved jobs{% endblock %}
+{% block content %}
+<section class="page-hero"><div class="container"><div class="eyebrow">YOUR SHORTLIST</div><h1>Saved jobs</h1><p class="muted">Keep promising opportunities close while you decide where to apply.</p></div></section>
+<div class="container page-content"><div class="row g-3">
+{% for saved in saved_jobs %}
+<div class="col-lg-6"><article class="job-card h-100">
+	<h2 class="h4">{{ saved.title_snapshot|default:saved.job.title }}</h2>
+	<p>{{ saved.company_snapshot|default:saved.job.company }} · {{ saved.location_snapshot|default:saved.job.location|default:"Location flexible" }}</p>
+	{% if saved.salary_snapshot or saved.job.salary %}<p class="small">{{ saved.salary_snapshot|default:saved.job.salary }}</p>{% endif %}
+	{% if saved.application %}<p><span class="status status-{{ saved.application.status }}">{{ saved.application.get_status_display }}</span></p>{% else %}<p class="small muted">Not applied</p>{% endif %}
+	{% if not saved.is_available %}<p class="small text-warning-emphasis">This listing is closed or no longer available.</p>{% endif %}
+	<div class="d-flex flex-wrap gap-2">
+		{% if saved.job %}<a class="btn btn-outline-primary rounded-pill" href="{% url 'job_detail' saved.job_id %}">View role</a>
+		<form method="post" action="{% url 'toggle_saved_job' saved.job_id %}">{% csrf_token %}<input type="hidden" name="next" value="{% url 'saved_jobs' %}"><button class="btn btn-primary rounded-pill" type="submit" aria-label="Remove {{ saved.job.title }} from saved jobs">Remove</button></form>
+		{% else %}<a class="btn btn-outline-primary rounded-pill" href="{% url 'dataset_job_detail' saved.source_key %}">View role</a>
+		<form method="post" action="{% url 'toggle_saved_dataset_job' saved.source_key %}">{% csrf_token %}<input type="hidden" name="next" value="{% url 'saved_jobs' %}"><button class="btn btn-primary rounded-pill" type="submit" aria-label="Remove {{ saved.title_snapshot }} from saved jobs">Remove</button></form>{% endif %}
+	</div>
+</article></div>
+{% empty %}<div class="panel"><p>No saved jobs yet. <a href="{% url 'job_list' %}">Explore roles</a> and save the ones you like.</p></div>{% endfor %}
+</div></div>
+{% endblock %}

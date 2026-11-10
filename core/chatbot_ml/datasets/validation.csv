@@ -1,0 +1,15 @@
+text,intent
+Can you assist me,greeting
+Show Python developer vacancies,job_search
+Find a role that fits my background,job_recommendation
+Which skills appear on my CV,skill_analysis
+What skills do I need to improve,missing_skills
+How can I optimize my CV for ATS,ats_help
+Give me an update on my applications,application_status
+Show my bookmarked positions,saved_jobs
+What vacancies are on my recruiter account,recruiter_jobs
+Which people have applied to my positions,recruiter_applicants
+Find applicants who fit a role,candidate_search
+How do I use this job site,website_faq
+Talk to you later,goodbye
+What is the speed of light,fallback

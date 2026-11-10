@@ -1,0 +1,62 @@
+{% extends 'core/base.html' %}
+{% block title %}Create account{% endblock %}
+{% block content %}
+<section class="auth-wrap container">
+  <div class="auth-card register-card">
+    <div class="eyebrow">WELCOME TO YOUR NEXT STEP</div>
+    <h1>Create your account</h1>
+    <p class="muted">Set up your profile, then verify your email to get started.</p>
+    <form class="register-form" method="post" novalidate>
+      {% csrf_token %}
+      {% if form.non_field_errors %}<div class="alert alert-danger" role="alert">{{ form.non_field_errors }}</div>{% endif %}
+      <div class="row g-3">
+        <div class="col-12">
+          <label for="{{ form.username.id_for_label }}">Username</label>
+          {{ form.username }}
+          {% for error in form.username.errors %}<div class="field-error">{{ error }}</div>{% endfor %}
+        </div>
+        <div class="col-md-6">
+          <label for="{{ form.first_name.id_for_label }}">First name <span class="muted">(optional)</span></label>
+          {{ form.first_name }}
+          {% for error in form.first_name.errors %}<div class="field-error">{{ error }}</div>{% endfor %}
+        </div>
+        <div class="col-md-6">
+          <label for="{{ form.last_name.id_for_label }}">Last name <span class="muted">(optional)</span></label>
+          {{ form.last_name }}
+          {% for error in form.last_name.errors %}<div class="field-error">{{ error }}</div>{% endfor %}
+        </div>
+        <div class="col-12">
+          <label for="{{ form.email.id_for_label }}">Email address</label>
+          {{ form.email }}
+          {% for error in form.email.errors %}<div class="field-error">{{ error }}</div>{% endfor %}
+          <small class="field-hint">We'll send a one-time verification code to this address.</small>
+        </div>
+        <div class="col-md-6">
+          <label for="{{ form.password1.id_for_label }}">Password</label>
+          {{ form.password1 }}
+          {% for error in form.password1.errors %}<div class="field-error">{{ error }}</div>{% endfor %}
+        </div>
+        <div class="col-md-6">
+          <label for="{{ form.password2.id_for_label }}">Confirm password</label>
+          {{ form.password2 }}
+          {% for error in form.password2.errors %}<div class="field-error">{{ error }}</div>{% endfor %}
+        </div>
+        <div class="col-12">
+          <fieldset class="role-fieldset">
+            <legend>I'm joining as</legend>
+            <div class="role-options">
+              {% for radio in form.role %}
+                <label class="role-choice" for="{{ radio.id_for_label }}">{{ radio.tag }}<span>{{ radio.choice_label }}</span></label>
+              {% endfor %}
+            </div>
+            {% for error in form.role.errors %}<div class="field-error">{{ error }}</div>{% endfor %}
+          </fieldset>
+        </div>
+      </div>
+      <button class="btn btn-primary w-100 rounded-pill py-3 mt-4" type="submit">Create account <span aria-hidden="true">↗</span></button>
+      <p class="registration-note"><svg class="nav-icon"><use href="#icon-info"></use></svg>Email verification is required before the account is activated. Codes are sent by your configured SMTP mail service.</p>
+    </form>
+    <p class="text-center mt-4 mb-0">Already registered? <a href="{% url 'login' %}">Sign in</a></p>
+  </div>
+</section>
+{% endblock %}

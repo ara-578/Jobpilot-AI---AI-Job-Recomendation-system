@@ -1,0 +1,137 @@
+.application-progress {
+  height: 6px;
+  margin: 14px 0 20px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #eceaf5;
+}
+
+.application-progress span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #24a879, #4c72ff);
+}
+
+.application-timeline {
+  display: flex;
+  list-style: none;
+  margin: 24px 0 12px;
+  padding: 0;
+}
+
+.application-timeline__step {
+  position: relative;
+  display: grid;
+  flex: 1;
+  grid-template-rows: 28px auto auto;
+  justify-items: center;
+  gap: 5px;
+  padding: 0 5px;
+  color: #77758d;
+  font-size: .78rem;
+  text-align: center;
+}
+
+.application-timeline__step::before {
+  position: absolute;
+  z-index: 0;
+  top: 13px;
+  left: 50%;
+  width: 100%;
+  height: 2px;
+  background: #dedbe9;
+  content: "";
+}
+
+.application-timeline__step:last-child::before {
+  display: none;
+}
+
+.application-timeline__marker {
+  z-index: 1;
+  display: grid;
+  width: 27px;
+  height: 27px;
+  place-items: center;
+  border: 2px solid #c9c6d5;
+  border-radius: 50%;
+  background: #fff;
+}
+
+.application-timeline__step.is-reached {
+  color: #267c5c;
+}
+
+.application-timeline__step.is-reached .application-timeline__marker {
+  border-color: #24a879;
+  background: #24a879;
+  color: #fff;
+}
+
+.application-timeline__step.is-reached .application-timeline__marker::after {
+  content: "✓";
+  font-weight: 800;
+}
+
+.application-timeline__step.is-current .application-timeline__marker {
+  outline: 3px solid #24a87933;
+}
+
+.application-timeline__step.is-current:not(.is-reached) .application-timeline__marker::after {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #6d4aff;
+  content: "";
+}
+
+.application-timeline__step time {
+  color: #77758d;
+  font-size: .68rem;
+}
+
+.application-timeline__step.is-rejected {
+  color: #b42332;
+}
+
+.application-timeline__step.is-rejected .application-timeline__marker {
+  border-color: #c93443;
+  background: #c93443;
+}
+
+.application-timeline__step.is-withdrawn {
+  color: #6c6879;
+}
+
+@media (max-width: 767px) {
+  .application-timeline {
+    display: grid;
+    gap: 12px;
+    margin-left: 3px;
+  }
+
+  .application-timeline__step {
+    grid-template-columns: 28px minmax(0, 1fr);
+    grid-template-rows: auto auto;
+    justify-items: start;
+    align-items: center;
+    min-height: 32px;
+    text-align: left;
+  }
+
+  .application-timeline__step::before {
+    top: 25px;
+    left: 12px;
+    width: 2px;
+    height: calc(100% + 12px);
+  }
+
+  .application-timeline__marker {
+    grid-row: span 2;
+  }
+
+  .application-timeline__step time {
+    grid-column: 2;
+  }
+}

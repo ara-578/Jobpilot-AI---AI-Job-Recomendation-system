@@ -1,0 +1,71 @@
+<div
+  class="jobpilot-chat"
+  data-chatbot-root
+  data-message-url="{% url 'chatbot_message' %}"
+  data-history-url="{% url 'chatbot_history' %}"
+  data-clear-url="{% url 'chatbot_clear' %}"
+>
+  <button
+    class="jobpilot-chat__launcher"
+    type="button"
+    data-chatbot-open
+    aria-label="Open JobPilot AI Assistant"
+    aria-expanded="false"
+    aria-controls="jobpilotChatPanel"
+  >
+    <span class="jobpilot-chat__launcher-badge" aria-hidden="true"></span>
+    <i class="fa-solid fa-comment-dots" aria-hidden="true"></i>
+    <span class="jobpilot-chat__launcher-label">Ask JobPilot</span>
+  </button>
+  <section
+    class="jobpilot-chat__panel"
+    id="jobpilotChatPanel"
+    data-chatbot-panel
+    aria-label="JobPilot AI Assistant"
+    aria-hidden="true"
+    hidden
+  >
+    <header class="jobpilot-chat__header">
+      <div class="jobpilot-chat__identity">
+        <span class="jobpilot-chat__avatar" aria-hidden="true"><i class="fa-solid fa-wand-magic-sparkles"></i></span>
+        <span><strong>JobPilot AI Assistant</strong><small>Job and career help</small></span>
+      </div>
+      <div class="jobpilot-chat__actions">
+        <button type="button" data-chatbot-clear aria-label="Clear conversation" title="Clear conversation">
+          <i class="fa-solid fa-rotate-left" aria-hidden="true"></i>
+        </button>
+        <button type="button" data-chatbot-close aria-label="Close assistant" title="Close">
+          <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+        </button>
+      </div>
+    </header>
+    <div class="jobpilot-chat__messages" data-chatbot-messages aria-live="polite" aria-relevant="additions text">
+      <article class="jobpilot-chat__message jobpilot-chat__message--assistant" data-welcome-message>
+        <span class="jobpilot-chat__message-avatar" aria-hidden="true"><i class="fa-solid fa-wand-magic-sparkles"></i></span>
+        <div class="jobpilot-chat__message-content">
+          <p>Hello! Welcome to JobPilot AI Assistant 👋
+I'm here to help you find suitable jobs, understand your resume, improve your ATS score, track your applications and explore JobPilot features.
+How can I help you today?</p>
+          <time data-chatbot-welcome-time></time>
+        </div>
+      </article>
+    </div>
+    <div class="jobpilot-chat__suggestions" data-chatbot-suggestions aria-label="Suggested questions">
+      <button type="button" class="jobpilot-chat__suggestion" data-chatbot-suggestion="Find jobs for me.">Find jobs for me.</button>
+      <button type="button" class="jobpilot-chat__suggestion" data-chatbot-suggestion="Analyze my resume">Analyze my resume</button>
+      <button type="button" class="jobpilot-chat__suggestion" data-chatbot-suggestion="Check my ATS score">Check my ATS score</button>
+      <button type="button" class="jobpilot-chat__suggestion" data-chatbot-suggestion="Show my application status">Show my application status</button>
+      <button type="button" class="jobpilot-chat__suggestion" data-chatbot-suggestion="Find jobs matching my skills">Find jobs matching my skills</button>
+      <button type="button" class="jobpilot-chat__suggestion" data-chatbot-suggestion="How do I use JobPilot?">How do I use JobPilot?</button>
+    </div>
+    <form class="jobpilot-chat__form" data-chatbot-form>
+      {% csrf_token %}
+      <label class="visually-hidden" for="jobpilotChatInput">Message the JobPilot AI Assistant</label>
+      <textarea id="jobpilotChatInput" name="message" rows="1" maxlength="1000" autocomplete="off" placeholder="Ask about jobs, resumes, or applications" data-chatbot-input required></textarea>
+      <button type="submit" aria-label="Send message" data-chatbot-send>
+        <i class="fa-solid fa-arrow-up" aria-hidden="true"></i>
+      </button>
+    </form>
+    <p class="jobpilot-chat__privacy">Verified job and account details are retrieved securely from JobPilot.</p>
+  </section>
+</div>

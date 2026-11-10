@@ -1,0 +1,51 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% block title %}Intelligent career matching{% endblock %}
+{% block content %}
+<section class="hero hero-photo" style="--hero-image: url('{% static 'img/jobpilot-career-recommendations.webp' %}')">
+  <div class="container position-relative">
+    <div class="row align-items-center gy-5">
+      <div class="col-lg-8">
+        <div class="eyebrow"><span class="pulse"></span> CAREER TOOLS BUILT AROUND YOUR EXPERIENCE</div>
+        <h1>Intelligent Career Matching.<br><span class="gradient-text">Meaningful Opportunities.</span></h1>
+        <p class="hero-copy">Discover opportunities aligned with your skills, experience, and ambitions. Use resume analysis and personalized job recommendations to make informed career decisions.</p>
+        <div class="d-flex flex-wrap gap-3 mt-4">
+          <a class="btn btn-primary rounded-pill px-4 py-3" href="{% url 'job_list' %}">Explore opportunities <span aria-hidden="true">↗</span></a>
+          {% if user_role == 'seeker' %}
+            <a class="btn btn-hero-outline rounded-pill px-4 py-3" href="{% url 'upload_resume' %}">Analyze my resume <span aria-hidden="true">↗</span></a>
+          {% elif user_role == 'recruiter' %}
+            <a class="btn btn-hero-outline rounded-pill px-4 py-3" href="{% url 'create_job' %}">Post a job <span aria-hidden="true">↗</span></a>
+          {% else %}
+            <a class="btn btn-hero-outline rounded-pill px-4 py-3" href="{% url 'login' %}?next=%2Fresume%2Fupload%2F">Analyze my resume <span aria-hidden="true">↗</span></a>
+          {% endif %}
+        </div>
+        <div class="hero-proofline mt-4">
+          <span><svg class="nav-icon"><use href="#icon-file"></use></svg> Resume insights</span>
+          <span><svg class="nav-icon"><use href="#icon-search"></use></svg> Skills-based matching</span>
+          <span><i class="fa-solid fa-clipboard-check nav-icon" aria-hidden="true"></i> Application tracking</span>
+        </div>
+      </div>
+      <div class="col-lg-4">
+        <aside class="hero-process" aria-label="How JobPilot works">
+          <div class="hero-process-label">A CLEARER WAY TO MOVE FORWARD</div>
+          <div class="hero-process-step"><span>01</span><div><b>Bring your experience</b><small>Upload a resume and review extracted skills.</small></div></div>
+          <div class="hero-process-step"><span>02</span><div><b>Compare relevant roles</b><small>See matching and missing skills alongside recommendations.</small></div></div>
+          <div class="hero-process-step"><span>03</span><div><b>Keep applications moving</b><small>Apply to real listings and follow status updates.</small></div></div>
+        </aside>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="container stats-strip" aria-label="JobPilot platform statistics">
+  <div><strong>{{ job_count }}</strong><span>Open opportunities</span></div><div><strong>{{ seeker_count }}</strong><span>Member profiles</span></div><div><strong>One profile</strong><span>Resume and applications</span></div><div><strong>Two-sided</strong><span>For talent and teams</span></div>
+</section>
+<section class="section-pad container">
+  <div class="section-heading text-center"><div class="eyebrow justify-content-center">A PRACTICAL WAY FORWARD</div><h2>Work, without the guesswork.</h2><p>Useful tools for every step, whether you're looking or hiring.</p></div>
+  <div class="row g-4 mt-2">
+    <div class="col-md-4"><div class="feature-card"><div class="feature-icon violet"><svg class="nav-icon"><use href="#icon-file"></use></svg></div><h4>Understand your resume</h4><p>Review extracted skills, predicted category, transparent ATS-style score, and actionable suggestions.</p><a href="{% url 'upload_resume' %}">Analyze your resume ↗</a></div></div>
+    <div class="col-md-4"><div class="feature-card"><div class="feature-icon blue"><svg class="nav-icon"><use href="#icon-search"></use></svg></div><h4>Find a better fit</h4><p>Compare skills and experience against real openings, then apply and track progress.</p><a href="{% url 'job_list' %}">Browse open roles ↗</a></div></div>
+    <div class="col-md-4"><div class="feature-card"><div class="feature-icon orange"><i class="fa-solid fa-users" aria-hidden="true"></i></div><h4>Build your team</h4><p>Publish roles, review opted-in candidates, and manage applications in one workspace.</p><a href="{% url 'register' %}">Join as a recruiter ↗</a></div></div>
+  </div>
+</section>
+<section class="container"><div class="cta-band"><div><div class="eyebrow">YOUR NEXT CHAPTER</div><h2>Good work starts with a good fit.</h2><p>Create your profile and take the next step on your terms.</p></div><a href="{% url 'register' %}" class="btn btn-light rounded-pill px-4 py-3">Get started ↗</a></div></section>
+{% endblock %}

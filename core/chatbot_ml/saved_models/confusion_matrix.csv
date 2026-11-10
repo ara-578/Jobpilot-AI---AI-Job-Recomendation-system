@@ -1,0 +1,15 @@
+actual/predicted,application_status,ats_help,candidate_search,fallback,goodbye,greeting,job_recommendation,job_search,missing_skills,recruiter_applicants,recruiter_jobs,saved_jobs,skill_analysis,website_faq
+application_status,2,0,0,0,0,0,0,0,0,0,0,0,0,0
+ats_help,0,2,0,0,0,0,0,0,0,0,0,0,0,1
+candidate_search,0,0,2,0,0,0,0,0,0,0,0,0,0,0
+fallback,0,0,0,2,0,0,0,0,0,0,0,0,0,0
+goodbye,0,0,0,0,2,0,0,0,0,0,0,0,0,0
+greeting,0,0,0,0,0,2,0,0,0,0,0,0,0,0
+job_recommendation,0,0,0,0,0,0,3,0,0,0,0,0,0,0
+job_search,0,0,0,0,0,0,0,5,0,0,0,0,0,0
+missing_skills,0,0,0,0,0,0,0,0,2,0,0,0,0,0
+recruiter_applicants,1,0,0,0,0,0,0,0,0,3,0,0,0,0
+recruiter_jobs,0,0,0,0,0,0,0,0,0,0,2,0,0,0
+saved_jobs,0,0,0,0,0,0,0,0,0,0,0,2,0,0
+skill_analysis,0,0,0,0,0,0,0,0,0,0,0,0,3,0
+website_faq,0,0,0,0,0,0,0,0,0,0,0,0,0,2

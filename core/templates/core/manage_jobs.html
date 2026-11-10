@@ -1,0 +1,33 @@
+{% extends 'core/base.html' %}{% block title %}Manage jobs{% endblock %}{% block content %}
+<section class="page-hero">
+<div class="container">
+<div class="eyebrow">RECRUITER STUDIO</div>
+<h1>Your job listings</h1>
+<a class="btn btn-primary rounded-pill mt-3" href="{% url 'create_job' %}">+ Post a job</a>
+</div>
+</section>
+<div class="container page-content">
+<div class="row g-3">
+{% for job in jobs %}
+<div class="col-lg-6">
+<div class="job-card">
+<div class="d-flex justify-content-between gap-2">
+<h4>{{ job.title }}</h4>
+<span class="badge-soft">{% if job.is_active %}Open{% else %}Closed{% endif %}</span>
+</div>
+<p>{{ job.company }} · {{ job.location }}</p>
+<p class="muted">{{ job.application_count }} applications</p>
+<div class="d-flex flex-wrap gap-2">
+<a class="btn btn-outline-primary rounded-pill" href="{% url 'job_candidates' job.id %}">Review candidates ↗</a>
+<a class="btn btn-outline-dark rounded-pill" href="{% url 'edit_job' job.id %}">Edit listing</a>
+<form method="post" action="{% url 'toggle_job_status' job.id %}">{% csrf_token %}<button class="btn btn-outline-dark rounded-pill" type="submit">{% if job.is_active %}Close listing{% else %}Reopen listing{% endif %}</button></form>
+<form method="post" action="{% url 'delete_recruiter_job' job.id %}" onsubmit="return confirm('Delete this job listing? Listings with applications must be closed to preserve history.');">{% csrf_token %}<button class="btn btn-outline-danger rounded-pill" type="submit">Delete listing</button></form>
+</div>
+</div>
+</div>
+{% empty %}
+<div class="panel">You have not posted a job yet.</div>
+{% endfor %}
+</div>
+</div>
+{% endblock %}

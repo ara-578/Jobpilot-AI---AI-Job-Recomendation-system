@@ -1,0 +1,98 @@
+{% extends 'core/base.html' %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<section class="page-hero">
+  <div class="container">
+    <div class="eyebrow">YOUR WORKSPACE</div>
+    <h1>{% if role == 'admin' %}Platform overview{% elif role == 'recruiter' %}Build your next great team.{% else %}Your next opportunity awaits.{% endif %}</h1>
+    <p class="muted mb-0">Welcome back, {{ user.first_name|default:user.username }}. {% if role == 'seeker' %}Your next step starts with a profile employers can understand.{% endif %}</p>
+    {% if role == 'seeker' %}<div class="dashboard-profile-progress mt-3"><div class="d-flex justify-content-between"><span>Profile completion</span><strong>{{ profile_completion }}%</strong></div><div class="progress mt-2" role="progressbar" aria-label="Profile completion" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ profile_completion }}"><div class="progress-bar" style="width:{{ profile_completion }}%"></div></div><a class="small" href="{% url 'profile' %}">Improve your profile ↗</a></div>{% endif %}
+  </div>
+</section>
+
+{# Role description with highlighted headings and bullet points #}
+{% if role == 'admin' %}
+  <div class="container page-content">
+    <h2 class="eyebrow">Admin Overview</h2>
+    <ul class="list">
+      <li>Manage all users, assign roles, and control permissions.</li>
+      <li>Monitor platform-wide statistics and activity logs.</li>
+      <li>Oversee job postings, approve listings, and maintain data integrity.</li>
+      <li>Configure system settings and integrate external services.</li>
+    </ul>
+  </div>
+{% elif role == 'recruiter' %}
+  <div class="container page-content">
+    <h2 class="eyebrow">Recruiter Dashboard</h2>
+    <ul class="list">
+      <li>Create and publish job listings.</li>
+      <li>Review and shortlist candidates.</li>
+      <li>Schedule interviews and track application statuses.</li>
+      <li>Access analytics on job performance and candidate pipelines.</li>
+    </ul>
+  </div>
+{% else %}
+  <div class="container page-content">
+    <h2 class="eyebrow">Job Seeker Hub</h2>
+    <ul class="list">
+      <li>Upload and analyze your resume.</li>
+      <li>Receive personalized job recommendations.</li>
+      <li>Save jobs and track your applications.</li>
+      <li>Review job matches, save opportunities, and follow application updates.</li>
+    </ul>
+  </div>
+{% endif %}
+
+<div class="container page-content">
+
+{% if role == 'admin' %}
+  <div class="row g-3">
+    <div class="col-sm-6 col-xl-3"><div class="stat-card"><small>Total users</small><h2>{{ users }}</h2></div></div>
+    <div class="col-sm-6 col-xl-3"><div class="stat-card"><small>Job seekers</small><h2>{{ seekers }}</h2></div></div>
+    <div class="col-sm-6 col-xl-3"><div class="stat-card"><small>Recruiters</small><h2>{{ recruiters }}</h2></div></div>
+    <div class="col-sm-6 col-xl-3"><div class="stat-card"><small>Live & closed jobs</small><h2>{{ jobs }}</h2></div></div>
+    <div class="col-sm-6 col-xl-3"><div class="stat-card"><small>Applications</small><h2>{{ applications }}</h2></div></div>
+  </div>
+  <div class="panel mt-4"><h3>Recent jobs</h3>{% for job in recent_jobs %}<div class="list-row"><div><b>{{ job.title }}</b><small>{{ job.company }} · {{ job.location }}</small></div><span class="status">{% if job.is_active %}Open{% else %}Closed{% endif %}</span></div>{% empty %}<p class="muted">No jobs have been posted yet.</p>{% endfor %}<a href="{% url 'administration_jobs' %}" class="btn btn-primary rounded-pill mt-3">Manage job listings ↗</a><a href="/admin/" class="btn btn-outline-primary rounded-pill mt-3">Open administration ↗</a></div>
+{% elif role == 'recruiter' %}
+  <div class="row g-3 mb-4">
+    <div class="col-md-4"><div class="stat-card"><small>Open job listings</small><h2>{{ open_job_count }}</h2></div></div>
+    <div class="col-md-4"><div class="stat-card"><small>Total applications</small><h2>{{ application_count }}</h2></div></div>
+    <div class="col-md-4"><div class="stat-card"><small>Discoverable candidates</small><h2>{{ discoverable_candidate_count }}</h2></div></div>
+  </div>
+  <section class="panel mb-4" aria-label="Recruiter application conversion">
+    <div class="d-flex flex-wrap justify-content-between align-items-start gap-3"><div><div class="eyebrow">YOUR APPLICATION PIPELINE</div><h3>Recruiter analytics</h3><p class="muted mb-0">Counts reflect applications to your own jobs that reached each stage in current status or recorded history.</p></div><div class="d-flex flex-wrap gap-2"><span class="badge-soft">{{ shortlisted_count }} shortlisted</span><span class="badge-soft">{{ interview_count }} interviews</span><span class="badge-soft">{{ selected_count }} selected</span><span class="badge-soft">{{ rejected_count }} rejected</span></div></div>
+    <div class="row g-3 mt-2"><div class="col-md-6"><div class="d-flex justify-content-between"><span>Shortlist share</span><b>{{ shortlist_rate }}%</b></div><div class="progress mt-2"><div class="progress-bar" style="width: {{ shortlist_rate }}%"></div></div></div><div class="col-md-6"><div class="d-flex justify-content-between"><span>Interview share</span><b>{{ interview_rate }}%</b></div><div class="progress mt-2"><div class="progress-bar" style="width: {{ interview_rate }}%"></div></div></div></div>
+  </section>
+  <div class="d-flex justify-content-between align-items-center mb-3"><h3>Your job listings</h3><a class="btn btn-primary rounded-pill" href="{% url 'create_job' %}">＋ Post a job</a></div>
+  <div class="row g-3">{% for job in jobs %}<div class="col-lg-6"><div class="job-card"><div class="job-card-top"><div><h4>{{ job.title }}</h4><p>{{ job.company }} · {{ job.location }}</p></div><span class="badge-soft">{{ job.application_count }} applicants</span></div><a href="{% url 'job_candidates' job.id %}" class="btn btn-outline-primary rounded-pill">Review candidates ↗</a></div></div>{% empty %}<div class="col-12"><div class="panel">No jobs posted yet. Publish your first opening to find relevant candidates.</div></div>{% endfor %}</div>
+  <h3 class="mt-5 mb-3">Recent applications</h3><div class="panel">{% for app in applications %}<div class="list-row"><div><b>{{ app.applicant.username }}</b><small>{{ app.job.title }} · Match {{ app.match_score|floatformat:0 }}%</small></div><span class="status">{{ app.get_status_display }}</span></div>{% empty %}<p class="muted">Applications to your jobs will appear here.</p>{% endfor %}<a href="{% url 'recruiter_applications' %}">Manage all applications ↗</a></div>
+{% else %}
+  <section class="panel mb-4">
+    <div class="d-flex justify-content-between align-items-center gap-3"><div><div class="eyebrow">APPLICATION ACTIVITY</div><h2 class="h4 mb-0">Status summary</h2></div><a href="{% url 'my_applications' %}" class="text-link">View tracker ↗</a></div>
+    <div class="row g-2 mt-2">{% for item in application_status_summary %}<div class="col-6 col-md-3"><div class="status-summary-tile"><strong>{{ item.total }}</strong><span>{{ item.status|title }}</span></div></div>{% empty %}<div class="col-12"><p class="muted mb-0">Your application status summary will appear after you apply to a role.</p></div>{% endfor %}</div>
+  </section>
+  <div id="career-insights" class="row g-3 mb-4">
+    <div class="col-lg-8"><div id="resume-analysis" class="panel gradient-panel"><div class="eyebrow">PROFILE SNAPSHOT</div><h3>{% if resume %}{{ resume.predicted_category|default:"Resume analyzed" }}{% else %}Start with your resume{% endif %}</h3>
+      {% if resume %}<p>Your resume readiness estimate</p><div class="d-flex align-items-center gap-3"><div class="score-circle" style="--score: {{ resume.ats_score }}%">{{ resume.ats_score }}<small>/100</small></div><div><b>{{ resume.extracted_skills|length }} skills detected</b>{% if resume.category_confidence %}<p class="muted mb-0">Category confidence: {{ resume.category_confidence|floatformat:2 }}</p>{% else %}<p class="muted mb-0">Category prediction confidence unavailable</p>{% endif %}<p class="muted mb-0">{{ resume.experience_years|floatformat:1 }} years professional experience</p><p class="muted mb-0">{{ resume.internship_experience_years|floatformat:1 }} years internship experience (not counted toward professional minimums)</p><p class="muted mb-0">{{ resume.extracted_projects|length }} projects · {{ resume.extracted_certifications|length }} certifications detected</p></div></div>
+      {% else %}<p>Upload a resume to see a clear skills overview and ranked opportunities.</p>{% endif %}
+      <a href="{% url 'upload_resume' %}" class="btn btn-primary rounded-pill mt-3">{% if resume %}Update resume{% else %}Upload resume{% endif %} ↗</a>{% if resume %}<a href="{% url 'resume_analysis' resume.id %}" class="btn btn-outline-primary rounded-pill mt-3">View full analysis ↗</a>{% endif %}
+    </div></div>
+    <div class="col-lg-4"><div class="stat-card h-100"><div class="feature-icon orange">✓</div><h4>Skills in your profile</h4>{% if resume %}<div class="skill-cloud">{% for skill in resume.extracted_skills %}<span>{{ skill }}</span>{% empty %}<span>No skills detected</span>{% endfor %}</div>{% else %}<p class="muted">Your extracted skills will appear here.</p>{% endif %}</div></div>
+  </div>
+  {% if skill_chart %}<section class="analytics-panel mb-5" aria-label="Resume skills distribution"><div class="d-flex flex-wrap align-items-start justify-content-between gap-2"><div><div class="eyebrow mb-2">RESUME ANALYSIS</div><h3 class="mb-1">Skills by discipline</h3><p class="muted mb-2">Share of your detected skills in each professional category.</p></div><span class="badge-soft">{{ resume.extracted_skills|length }} skills</span></div>{% for group in skill_chart %}<div class="analytics-row"><span class="analytics-label">{{ group.label }} <small>({{ group.count }})</small></span><div class="analytics-track" role="img" aria-label="{{ group.label }}: {{ group.percentage }} percent"><div class="analytics-fill" style="--bar-width: {{ group.percentage }}%"></div></div><span class="analytics-value">{{ group.percentage }}%</span></div>{% endfor %}</section>{% endif %}
+  <div id="recommendations" class="d-flex justify-content-between align-items-center mb-3"><div><div class="eyebrow">RANKED AGAINST YOUR RESUME</div><h2>Recommended jobs</h2></div><a href="{% url 'job_list' %}" class="text-link">Explore all ↗</a></div>
+  {% include "core/partials/recommendation_results.html" %}
+  <section class="dashboard-job-section mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-3"><div><div class="eyebrow">RECENTLY PUBLISHED</div><h2 class="h3 mb-0">Latest jobs</h2></div><a href="{% url 'job_list' %}" class="text-link">Search all jobs ↗</a></div>
+    <div class="row g-3">{% for job in latest_jobs %}<div class="col-md-6"><article class="job-card h-100"><div class="job-card-top"><div><h3 class="h5"><a href="{% url 'job_detail' job.pk %}">{{ job.title }}</a></h3><p>{{ job.company }} · {{ job.location|default:"Location flexible" }}</p></div></div><p class="small muted">{{ job.employment_type }} · {{ job.get_work_mode_display }} · {{ job.created_at|date:"M d, Y" }}</p><a class="btn btn-sm btn-outline-primary rounded-pill" href="{% url 'job_detail' job.pk %}">View job</a></article></div>{% empty %}<div class="col-12"><p class="empty-state">No published database jobs are available right now.</p></div>{% endfor %}</div>
+  </section>
+  <div class="row g-4 mt-2">
+    <section class="col-lg-6"><div class="panel h-100"><div class="d-flex justify-content-between align-items-center"><h2 class="h4">Saved jobs</h2><a href="{% url 'saved_jobs' %}" class="text-link">View all ↗</a></div>{% for saved in saved_jobs_preview %}<div class="list-row"><div><b>{% if saved.preview_url %}<a href="{{ saved.preview_url }}">{{ saved.preview_title }}</a>{% else %}{{ saved.preview_title }}{% endif %}</b><small>{{ saved.preview_company }} · {{ saved.preview_location|default:"Location flexible" }}</small></div><span class="status">{% if saved.job %}{{ saved.job.created_at|date:"M d" }}{% else %}Saved{% endif %}</span></div>{% empty %}<p class="muted">Save interesting roles to revisit them here.</p>{% endfor %}</div></section>
+    <section class="col-lg-6"><div class="panel h-100"><div class="d-flex justify-content-between align-items-center"><h2 class="h4">Recently viewed</h2><a href="{% url 'job_list' %}" class="text-link">Explore jobs ↗</a></div>{% for viewed in recently_viewed_jobs %}<div class="list-row"><div><b><a href="{% url 'job_detail' viewed.job_id %}">{{ viewed.job.title }}</a></b><small>{{ viewed.job.company }} · Viewed {{ viewed.viewed_at|date:"M d, H:i" }}</small></div><span class="status">{{ viewed.job.location|default:"Flexible" }}</span></div>{% empty %}<p class="muted">Jobs you view will appear here for easy access.</p>{% endfor %}</div></section>
+  </div>
+  <h3 class="mt-5 mb-3">Resume upload history</h3><div class="panel">{% for item in resume_history %}<div class="list-row"><div><b>{{ item.file.name|slice:"8:" }}</b><small>{{ item.uploaded_at|date:"M d, Y H:i" }} · {{ item.predicted_category|default:"Category unavailable" }}</small></div><span class="score-pill">{{ item.ats_score }}/100<small>ATS</small></span></div>{% empty %}<p class="muted">Your analyzed resumes and ATS scores will appear here.</p>{% endfor %}</div>
+  <h3 class="mt-5 mb-3">Application tracker</h3><div class="panel">{% for app in applications %}<div class="list-row"><div><b>{{ app.display_title }}</b><small>{{ app.display_company }} · Applied {{ app.created_at|date:"M d, Y" }}</small></div><span class="status">{{ app.get_status_display }}</span></div>{% empty %}<p class="muted">Your applications will appear here.</p>{% endfor %}<a href="{% url 'my_applications' %}">View all applications ↗</a></div>
+{% endif %}
+</div>
+{% endblock %}

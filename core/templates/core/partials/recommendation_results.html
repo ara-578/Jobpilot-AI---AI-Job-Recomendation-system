@@ -1,0 +1,96 @@
+{% load static %}
+<div class="recommendation-results"
+     data-recommendation-results
+     data-updates-url="{{ recommendation_updates_url }}"
+     data-status="{{ recommendation_status }}"
+     data-retry-url="{{ recommendation_retry_url }}">
+  {% if recommendation_status == "queued" or recommendation_status == "processing" %}
+    <div class="panel mb-3" role="status" aria-live="polite" data-recommendation-status>
+      <h3>Finding your best matches</h3>
+      <p class="muted mb-3">Your recommendations are being prepared in the background. You can continue using JobPilot while this runs.</p>
+      <div class="recommendation-skeletons" aria-hidden="true">
+        <div class="recommendation-skeleton"></div>
+        <div class="recommendation-skeleton"></div>
+      </div>
+    </div>
+  {% elif recommendation_status == "failed" %}
+    <div class="alert alert-warning" role="alert" data-recommendation-status>
+      <p>{{ recommendation_error|default:"Recommendations are temporarily unavailable." }}</p>
+      <form method="post" action="{{ recommendation_retry_url }}">
+        {% csrf_token %}
+        <button class="btn btn-outline-primary rounded-pill" type="submit">Try again</button>
+      </form>
+    </div>
+  {% elif recommendation_status == "ready" %}
+    {% if profile.suitable_roles %}
+      <section class="panel mb-3" aria-label="Suitable job roles">
+        <h3>Role directions supported by your resume</h3>
+        <div class="skill-cloud">{% for role in profile.suitable_roles %}<span>{{ role|title }}</span>{% endfor %}</div>
+        <p class="muted small mb-0">These role directions are inferred from resume titles and combinations of extracted skills; review each listing's requirements.</p>
+      </section>
+    {% endif %}
+    <p class="muted small">Scores compare verified resume skills (40%), role/title and text relevance (25%), experience (15%), education (10%), and preferences (10%). Unknown dimensions are left out rather than treated as zero. Minimum experience and explicitly required certifications are eligibility checks. Each card identifies its text-matching method; scores describe job relevance, not hiring probability.</p>
+    <div class="row g-3">
+      {% for rec in recommendations %}
+        <div class="col-lg-6">
+          <div class="job-card h-100">
+            <div class="job-card-top">
+              <div class="recommendation-company">
+                <img class="company-logo" src="{% if rec.job and rec.job.company_logo %}{{ rec.job.company_logo.url }}{% else %}{% static 'images/companies/default_company.svg' %}{% endif %}" data-fallback-src="{% static 'images/companies/default_company.svg' %}" alt="{{ rec.company }} logo" width="56" height="56" loading="lazy">
+                <h4 class="mt-2"><a class="job-title-link" href="{% if rec.source == 'dataset' %}{% url 'dataset_job_detail' rec.source_key %}{% elif rec.job %}{% url 'job_detail' rec.job.id %}{% else %}{% url 'job_detail' rec.source_key %}{% endif %}">{{ rec.job_title }}</a></h4>
+                <p>{{ rec.company }} · {{ rec.location|default:"Location flexible" }}</p>
+                <span class="badge-soft">{{ rec.source_label|default:"Database" }}</span>
+              </div>
+              <div class="match-meter" role="progressbar" aria-label="Overall resume match" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ rec.match_score|floatformat:0 }}" style="--match-score:{{ rec.match_score|floatformat:0 }}%">
+                <span>{{ rec.match_score|floatformat:0 }}%</span>
+                <small>Overall match</small>
+              </div>
+            </div>
+            <p class="job-desc">{{ rec.description|default:"Job details are available to review."|truncatewords:24 }}</p>
+            <div class="job-meta-row">
+              <span>{{ rec.employment_type|default:"Employment type not specified" }}</span>
+              <span>{{ rec.experience_level|default:"Experience not specified" }}</span>
+              <span>{{ rec.salary|default:"Salary not specified" }}</span>
+              {% if rec.job and rec.job.created_at %}<span>Posted {{ rec.job.created_at|date:"M d, Y" }}</span>{% endif %}
+            </div>
+            <p class="muted small mb-2">{{ rec.why_match }} {{ rec.experience_compatibility }}</p>
+            <p class="match-component"><span>Required-skill match</span><strong>{% if rec.score_components.required_skills != None %}{{ rec.matched_required_skills_count }}/{{ rec.required_skills_count }} · {{ rec.score_components.required_skills|floatformat:0 }}%{% else %}No required skills listed{% endif %}</strong></p>
+            <p class="small mb-2"><strong>Required skills:</strong> {{ rec.required_skills|default:"Not specified"|truncatechars:120 }}</p>
+            <div class="skill-cloud">
+              {% for skill in rec.matching_skills|slice:":5" %}<span class="skill-good">✓ {{ skill }}</span>{% endfor %}
+              {% for skill in rec.missing_skills|slice:":5" %}<span class="skill-missing">Missing required: {{ skill }}</span>{% endfor %}
+              {% for skill in rec.missing_preferred_skills|slice:":3" %}<span class="skill-missing">Optional: {{ skill }}</span>{% endfor %}
+              {% for certification in rec.missing_certifications %}<span class="skill-missing">Required certification: {{ certification }}</span>{% endfor %}
+            </div>
+            <details class="mt-2">
+              <summary>Match score breakdown</summary>
+              <ul class="small muted mb-0">
+                <li>Skills: {{ rec.score_components.skills|default_if_none:"Unknown" }}%</li>
+                <li>Role and job text: {{ rec.score_components.title_relevance|default_if_none:"Unknown" }}%</li>
+                <li>Experience: {{ rec.score_components.experience|default_if_none:"Unknown" }}%</li>
+                <li>Education: {{ rec.score_components.education|default_if_none:"Unknown" }}%</li>
+                <li>Preferences: {{ rec.score_components.preferences|default_if_none:"Unknown" }}%</li>
+                <li>Text evidence: {{ rec.score_components.semantic_text_similarity|default_if_none:"Unknown" }}% ({{ rec.score_components.similarity_source }})</li>
+              </ul>
+            </details>
+            <div class="d-flex justify-content-between align-items-center mt-3 gap-2">
+              <span class="muted small">{{ rec.experience_level|default:"Experience flexible" }} · {{ rec.salary|default:"Salary not specified" }}</span>
+              <div class="d-flex flex-wrap gap-2">
+                {% if rec.source == 'dataset' %}<a class="btn btn-sm btn-outline-primary rounded-pill px-3" href="{% url 'dataset_job_detail' rec.source_key %}">View details</a>{% elif rec.job %}<a class="btn btn-sm btn-outline-primary rounded-pill px-3" href="{% url 'job_detail' rec.job.id %}">View details</a>{% endif %}
+                {% if rec.has_applied %}<a class="btn btn-sm btn-outline-primary rounded-pill px-3" href="{% url 'my_applications' %}">Track application</a>
+                {% elif rec.source == 'dataset' %}<a class="btn btn-sm btn-primary rounded-pill px-3" href="{% url 'apply_dataset_job' rec.source_key %}">Apply now</a>
+                {% elif rec.job %}<a class="btn btn-sm btn-primary rounded-pill px-3" href="{% url 'apply_job' rec.job.id %}">Apply now</a>{% endif %}
+                {% if rec.source == 'dataset' %}<form method="post" action="{% url 'toggle_saved_dataset_job' rec.source_key %}">{% csrf_token %}<input type="hidden" name="next" value="{{ request.get_full_path }}"><button class="btn btn-sm btn-outline-primary rounded-pill" type="submit" aria-label="{% if rec.is_saved %}Unsave{% else %}Save{% endif %} {{ rec.job_title }}"><i class="{% if rec.is_saved %}fa-solid{% else %}fa-regular{% endif %} fa-bookmark" aria-hidden="true"></i> {% if rec.is_saved %}Saved{% else %}Save{% endif %}</button></form>{% elif rec.job %}<form method="post" action="{% url 'toggle_saved_job' rec.job.id %}">{% csrf_token %}<input type="hidden" name="next" value="{{ request.get_full_path }}"><button class="btn btn-sm btn-outline-primary rounded-pill" type="submit" aria-label="{% if rec.is_saved %}Unsave{% else %}Save{% endif %} {{ rec.job_title }}"><i class="{% if rec.is_saved %}fa-solid{% else %}fa-regular{% endif %} fa-bookmark" aria-hidden="true"></i> {% if rec.is_saved %}Saved{% else %}Save{% endif %}</button></form>{% endif %}
+              </div>
+              {% if rec.application_url %}<a class="small" href="{{ rec.application_url }}" target="_blank" rel="noopener noreferrer">Employer link ↗</a>{% endif %}
+            </div>
+          </div>
+        </div>
+      {% empty %}
+        <div class="col-12"><div class="panel"><h3>No good matches found yet</h3><p>No current jobs meet the minimum skill, role, or resume-text relevance checks. Search all openings to explore other roles.</p></div></div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="panel"><h3>No good matches found yet</h3><p>{% if not resume %}Upload your resume to get personalized job suggestions.{% else %}Upload an analyzed resume to get personalized job suggestions.{% endif %}</p></div>
+  {% endif %}
+</div>

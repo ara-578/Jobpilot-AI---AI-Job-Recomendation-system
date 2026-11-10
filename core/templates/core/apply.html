@@ -1,0 +1,13 @@
+{% extends 'core/base.html' %}
+{% block title %}Apply for {{ job_title }}{% endblock %}
+{% block content %}
+<section class="page-hero"><div class="container"><div class="eyebrow">APPLICATION · {% if is_dataset %}IMPORTED LISTING{% else %}{{ job.company }}{% endif %}</div><h1>Apply to {{ job_title }}</h1><p class="muted">Your details will be shared with the recruiter for this role.</p></div></section>
+<div class="container narrow page-content"><div class="panel">
+	<form method="post" enctype="multipart/form-data" novalidate>
+		{% csrf_token %}
+		{% if form.non_field_errors %}<div class="alert alert-danger" role="alert">{{ form.non_field_errors }}</div>{% endif %}
+		{{ form.as_p }}
+		<button class="btn btn-primary rounded-pill px-4" type="submit">Submit application</button>
+	</form>
+</div></div>
+{% endblock %}

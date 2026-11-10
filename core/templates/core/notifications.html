@@ -1,0 +1,11 @@
+{% extends 'core/base.html' %}
+{% block title %}Notifications{% endblock %}
+{% block content %}
+<section class="page-hero"><div class="container"><div class="eyebrow">YOUR UPDATES</div><h1>Notifications</h1><p class="muted">Application status changes and interview updates.</p></div></section>
+<div class="container page-content"><div class="panel" id="notification-list">
+{% if unread_notification_count %}<form method="post" action="{% url 'mark_notifications_read' %}" class="mb-3">{% csrf_token %}<button class="btn btn-outline-primary btn-sm" type="submit">Mark all as read</button></form>{% endif %}
+{% for notification in notifications %}
+<article class="list-row align-items-start"><div class="flex-grow-1"><b>{{ notification.title }}</b><p class="mb-1">{{ notification.message }}</p><small>{{ notification.created_at|date:"M d, Y H:i" }}{% if notification.application %} · {{ notification.application.display_company }}{% elif notification.job %} · {{ notification.job.company }}{% endif %}</small></div>{% if notification.application %}<a class="btn btn-sm btn-outline-primary" href="{% if user_role == 'recruiter' %}{% url 'recruiter_applications' %}{% else %}{% url 'my_applications' %}{% endif %}">{% if user_role == 'recruiter' %}Review applications{% else %}View tracker{% endif %}</a>{% elif notification.job_url %}<a class="btn btn-sm btn-outline-primary" href="{{ notification.job_url }}">View job</a>{% endif %}</article>
+{% empty %}<p>No notifications yet. Application and interview updates will appear here.</p>{% endfor %}
+</div></div>
+{% endblock %}

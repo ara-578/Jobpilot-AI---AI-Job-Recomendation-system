@@ -1,0 +1,37 @@
+text,intent
+Hey JobPilot, greeting
+Good afternoon can you assist, greeting
+Find Python work in Kochi, job_search
+Are there any data analyst vacancies, job_search
+What positions suit my CV, job_recommendation
+Recommend suitable roles using my resume, job_recommendation
+Which technical skills are on my CV, skill_analysis
+Show me the skills you found, skill_analysis
+What am I missing for a data job, missing_skills
+Which required skills are absent from my resume, missing_skills
+How do I raise my ATS rating, ats_help
+Give my CV an ATS improvement review, ats_help
+How many applications are still pending, application_status
+Did I get an interview for any application, application_status
+Open my saved vacancies, saved_jobs
+Show the roles I bookmarked earlier, saved_jobs
+Show jobs I have published, recruiter_jobs
+List active listings created by me, recruiter_jobs
+Show shortlisted applicants for my job, recruiter_applicants
+Display applicants who applied to my vacancies, recruiter_applicants
+Search for a Django candidate, candidate_search
+Find a suitable person for my vacancy, candidate_search
+How do I register on JobPilot, website_faq
+Where can I create an ATS resume, website_faq
+See you next time, goodbye
+Thanks for everything bye, goodbye
+Tell me a story about dragons, fallback
+What time does the museum open, fallback
+Find jobs matching my skills,job_recommendation
+Show recently posted jobs,job_search
+Find AI/ML internships,job_search
+Find jobs in Trivandrum,job_search
+Analyze my resume,skill_analysis
+What does my ATS score mean,ats_help
+How many applicants do I have,recruiter_applicants
+Show shortlisted candidates,recruiter_applicants

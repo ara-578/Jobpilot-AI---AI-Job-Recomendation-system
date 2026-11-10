@@ -1,0 +1,12 @@
+{% extends 'core/base.html' %}
+{% block title %}Application submitted{% endblock %}
+{% block content %}
+<section class="page-hero"><div class="container"><div class="eyebrow">{% if application.source == 'dataset' %}TRACKER ENTRY{% else %}APPLICATION RECEIVED{% endif %}</div><h1>{% if application.source == 'dataset' %}Saved to your tracker.{% else %}Your application is in.{% endif %}</h1><p class="muted">{% if application.source == 'dataset' %}This imported listing is not connected to a JobPilot recruiter, so this record does not confirm delivery to the employer.{% else %}A copy is now available in your application tracker.{% endif %}</p></div></section>
+<div class="container narrow page-content"><section class="panel" aria-labelledby="confirmation-title">
+  <h2 id="confirmation-title">{{ application.display_title }}</h2>
+  <p>{{ application.display_company }}{% if application.job and application.job.location %} · {{ application.job.location }}{% endif %}</p>
+  <p><span class="status status-{{ application.status }}">{{ application.get_status_display }}</span></p>
+  <p class="muted">Submitted {{ application.created_at|date:"M d, Y H:i" }} · Reference {{ application.reference }}</p>
+  <div class="d-flex flex-wrap gap-2"><a class="btn btn-primary rounded-pill" href="{% url 'my_applications' %}">Track application</a>{% if application.source == 'dataset' and employer_application_url %}<a class="btn btn-outline-primary rounded-pill" href="{{ employer_application_url }}" target="_blank" rel="noopener noreferrer">Continue on employer website ↗</a>{% endif %}<a class="btn btn-outline-primary rounded-pill" href="{% url 'job_list' %}">Explore more jobs</a></div>
+</section></div>
+{% endblock %}

@@ -1,0 +1,145 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% block title %}{{ job_details.title }} at {{ job_details.company }}{% endblock %}
+{% block content %}
+<section class="job-detail-hero">
+  <div class="container">
+    <a class="back-link" href="{% url 'job_list' %}">← Back to search</a>
+    <div class="job-detail-heading">
+      <img class="company-logo company-logo-large" src="{% if job_details.logo_url %}{{ job_details.logo_url }}{% else %}{% static 'images/companies/default_company.svg' %}{% endif %}" data-fallback-src="{% static 'images/companies/default_company.svg' %}" alt="{{ job_details.company }} logo" width="72" height="72">
+      <div class="flex-grow-1">
+        <div class="eyebrow">{{ source_label }} opportunity</div>
+        <h1>{{ job_details.title }}</h1>
+        <p class="muted mb-2">{% if company_profile_id %}<a href="{% url 'company_profile' company_profile_id %}">{{ job_details.company }}</a>{% else %}{{ job_details.company }}{% endif %}{% if job_details.location %} · {{ job_details.location }}{% endif %}</p>
+        <div class="job-meta-row">
+          <span>{{ job_details.employment_type|default:"Employment type not specified" }}</span>
+          <span>{{ job_details.work_mode|default:"Work mode not specified" }}</span>
+          <span>{{ job_details.experience_level|default:"Experience not specified" }}</span>
+          <span>{{ job_details.salary|default:"Salary not specified" }}</span>
+        </div>
+      </div>
+      {% if score != None %}
+        <div class="match-meter match-meter-large" role="progressbar" aria-label="AI resume match" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ score|floatformat:0 }}" style="--match-score:{{ score|floatformat:0 }}%">
+          <span>{{ score|floatformat:0 }}%</span>
+          <small>{% if score >= 80 %}Excellent{% elif score >= 60 %}Good{% else %}Partial{% endif %} match</small>
+        </div>
+      {% endif %}
+    </div>
+    <nav class="job-section-nav" aria-label="Job details sections">
+      <a href="#overview">Overview</a><a href="#company">Company</a><a href="#description">Description</a>
+      {% if job_match %}<a href="#match-analysis">Your match</a>{% endif %}
+      {% if related_jobs %}<a href="#related-jobs">Related roles</a>{% endif %}
+    </nav>
+  </div>
+</section>
+
+<div class="container page-content job-detail-layout">
+  <main>
+    <section class="panel job-detail-section" id="overview">
+      <div class="section-kicker">Role overview</div>
+      <h2>Job overview</h2>
+      <dl class="job-overview-grid">
+        <div><dt>Job title</dt><dd>{{ job_details.title }}</dd></div>
+        <div><dt>Department</dt><dd>{{ job_details.department|default:"Not specified" }}</dd></div>
+        <div><dt>Employment type</dt><dd>{{ job_details.employment_type|default:"Not specified" }}</dd></div>
+        <div><dt>Work mode</dt><dd>{{ job_details.work_mode|default:"Not specified" }}</dd></div>
+        <div><dt>Experience</dt><dd>{% if job_details.required_experience_years or job_details.max_experience_years %}{{ job_details.required_experience_years|default:"0" }}{% if job_details.max_experience_years %}–{{ job_details.max_experience_years }}{% else %}+{% endif %} years{% else %}{{ job_details.experience_level|default:"Not specified" }}{% endif %}</dd></div>
+        <div><dt>Posted</dt><dd>{% if job_details.posted_at %}{{ job_details.posted_at|date:"M d, Y" }}{% else %}Not specified{% endif %}</dd></div>
+        {% if job_details.openings %}<div><dt>Openings</dt><dd>{{ job_details.openings }}</dd></div>{% endif %}
+      </dl>
+    </section>
+
+    <section class="panel job-detail-section" id="description">
+      <div class="section-kicker">The opportunity</div>
+      <h2>Job description</h2>
+      <div class="job-description-copy">{{ job_details.description|default:"No description provided." }}</div>
+      {% if job_details.responsibilities %}
+        <h3>Key responsibilities</h3>
+        <ul class="job-detail-list">{% for item in job_details.responsibilities %}<li>{{ item }}</li>{% endfor %}</ul>
+      {% endif %}
+      {% if job_details.qualifications %}
+        <h3>Qualifications</h3>
+        <ul class="job-detail-list">{% for item in job_details.qualifications %}<li>{{ item }}</li>{% endfor %}</ul>
+      {% endif %}
+    </section>
+
+    <section class="panel job-detail-section">
+      <div class="section-kicker">Role requirements</div>
+      <h2>Required technical skills</h2>
+      {% if job_details.required_skills %}<div class="skill-cloud">{% for skill in job_details.required_skills %}<span>{{ skill }}</span>{% endfor %}</div>{% else %}<p class="muted">Not specified.</p>{% endif %}
+      {% if job_details.preferred_skills %}<h3>Preferred skills</h3><div class="skill-cloud">{% for skill in job_details.preferred_skills %}<span>{{ skill }}</span>{% endfor %}</div>{% endif %}
+      {% if job_details.education_requirements %}<h3>Education and qualifications</h3><ul class="job-detail-list">{% for item in job_details.education_requirements %}<li>{{ item }}</li>{% endfor %}</ul>{% endif %}
+      {% if job_details.benefits %}<h3>Salary and benefits</h3><p><strong>{{ job_details.salary|default:"Salary not specified" }}</strong></p><ul class="job-detail-list">{% for item in job_details.benefits %}<li>{{ item }}</li>{% endfor %}</ul>{% elif job_details.salary %}<h3>Salary and benefits</h3><p>{{ job_details.salary }}</p>{% endif %}
+    </section>
+
+    {% if job_match %}
+      <section class="panel job-detail-section" id="match-analysis">
+        <div class="section-kicker">Based on your active resume</div>
+        <h2>Your Match Analysis</h2><p class="muted small">How your resume matches this role</p>
+        <p>{{ job_match.why_match }}</p>
+        <div class="match-component">
+          <span>Skills match</span>
+          <div class="progress" role="progressbar" aria-label="Skills match" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ job_match.score_components.skills|floatformat:0 }}"><div class="progress-bar" style="width:{{ job_match.score_components.skills|floatformat:0 }}%"></div></div>
+          <strong>{{ job_match.score_components.skills|default_if_none:"Not available" }}{% if job_match.score_components.skills != None %}%{% endif %}</strong>
+        </div>
+        <div class="match-component-list">
+          <div><h3>Matching skills</h3><div class="skill-cloud">{% for skill in job_match.matching_skills %}<span class="skill-good">✓ {{ skill }}</span>{% empty %}<span>None identified</span>{% endfor %}</div></div>
+          <div><h3>Missing required skills</h3><div class="skill-cloud">{% for skill in job_match.missing_skills %}<span class="skill-missing">Missing required: {{ skill }}</span>{% empty %}<span>No missing required skills identified</span>{% endfor %}</div></div>
+        </div>
+        <details class="mt-3"><summary>Experience and education compatibility</summary><ul class="job-detail-list mt-2"><li>{{ job_match.experience_compatibility|default:"Experience compatibility not available." }}</li><li>Education score: {{ job_match.score_components.education|default_if_none:"Not available" }}{% if job_match.score_components.education != None %}%{% endif %}</li></ul></details>
+        <details class="mt-3"><summary>Match score breakdown</summary><ul class="small muted mb-0"><li>Skills: {{ job_match.score_components.skills|default_if_none:"Unknown" }}%</li><li>Role and job text: {{ job_match.score_components.title_relevance|default_if_none:"Unknown" }}%</li><li>Experience: {{ job_match.score_components.experience|default_if_none:"Unknown" }}%</li><li>Education: {{ job_match.score_components.education|default_if_none:"Unknown" }}%</li><li>Preferences: {{ job_match.score_components.preferences|default_if_none:"Unknown" }}%</li><li>Text evidence: {{ job_match.score_components.semantic_text_similarity|default_if_none:"Unknown" }}% ({{ job_match.score_components.similarity_source }})</li></ul></details>
+        {% if job_match.relevant_resume_evidence %}<h3>Resume evidence</h3>{% for item in job_match.relevant_resume_evidence %}<p class="muted small mb-1"><strong>{{ item.skill }}:</strong> “{{ item.text }}”</p>{% endfor %}{% endif %}
+        {% if job_match.learning_project_suggestions %}<h3>Ways to build missing skills</h3><ul class="job-detail-list">{% for suggestion in job_match.learning_project_suggestions %}<li><strong>{{ suggestion.skill }}:</strong> {{ suggestion.suggestion }}</li>{% endfor %}</ul><p class="muted small">These are learning ideas, not claims about your existing qualifications.</p>{% endif %}
+      </section>
+    {% endif %}
+
+    <section class="panel job-detail-section" id="company">
+      <div class="section-kicker">The team</div>
+      <h2>About the company</h2>
+      <div class="company-about">
+        <img class="company-logo" src="{% if job_details.logo_url %}{{ job_details.logo_url }}{% else %}{% static 'images/companies/default_company.svg' %}{% endif %}" data-fallback-src="{% static 'images/companies/default_company.svg' %}" alt="{{ job_details.company }} logo" width="56" height="56" loading="lazy">
+        <div><h3>{% if company_profile_id %}<a href="{% url 'company_profile' company_profile_id %}">{{ job_details.company }}</a>{% else %}{{ job_details.company }}{% endif %}</h3>{% if job_details.company_industry %}<p class="muted mb-1">{{ job_details.company_industry }}</p>{% endif %}{% if job_details.company_location %}<p class="muted mb-0">{{ job_details.company_location }}</p>{% endif %}</div>
+      </div>
+      <p class="preserve-lines mt-3">{{ job_details.company_description|default:"Company description not provided." }}</p>
+      {% if job_details.company_website %}<a href="{{ job_details.company_website }}" target="_blank" rel="noopener noreferrer">Company website ↗</a>{% endif %}
+    </section>
+
+    {% if related_jobs %}
+      <section class="job-detail-section" id="related-jobs">
+        <div class="section-kicker">Keep exploring</div><h2>Related jobs</h2>
+        <div class="row g-3">
+          {% for related in related_jobs %}<div class="col-md-6"><article class="panel related-job-card">
+            <img class="company-logo" src="{% if related.company_logo %}{{ related.company_logo.url }}{% else %}{% static 'images/companies/default_company.svg' %}{% endif %}" data-fallback-src="{% static 'images/companies/default_company.svg' %}" alt="{{ related.company }} logo" width="44" height="44" loading="lazy">
+            <h3><a href="{% url 'job_detail' related.id %}">{{ related.title }}</a></h3><p class="muted">{{ related.company }} · {{ related.location|default:"Location not specified" }}</p>
+            <a class="btn btn-sm btn-outline-primary rounded-pill" href="{% url 'job_detail' related.id %}">View role</a>
+          </article></div>{% endfor %}
+        </div>
+      </section>
+    {% endif %}
+  </main>
+
+  <aside class="job-action-sidebar">
+    <div class="panel job-action-panel">
+      <h2>Interested in this role?</h2>
+      {% if job.deadline %}<p class="muted small">Applications close {{ job.deadline|date:"M d, Y" }}</p>{% elif job.expires_at %}<p class="muted small">Applications close {{ job.expires_at|date:"M d, Y" }}</p>{% endif %}
+      {% if user.is_authenticated and user_role == 'seeker' %}
+        {% if applied %}<a class="btn btn-outline-primary rounded-pill w-100" href="{% url 'my_applications' %}">Track your application</a>
+        {% elif is_dataset %}<a class="btn btn-primary rounded-pill w-100" href="{% url 'apply_dataset_job' job_key %}">Apply now</a>
+        {% else %}<a class="btn btn-primary rounded-pill w-100" href="{% url 'apply_job' job.id %}">Apply now</a>{% endif %}
+        <form class="mt-2" method="post" action="{% if is_dataset %}{% url 'toggle_saved_dataset_job' job_key %}{% else %}{% url 'toggle_saved_job' job.id %}{% endif %}">{% csrf_token %}<input type="hidden" name="next" value="{{ request.path }}"><button class="btn btn-outline-primary rounded-pill w-100" type="submit" aria-label="{% if is_saved %}Remove saved job{% else %}Save job{% endif %}"><i class="{% if is_saved %}fa-solid{% else %}fa-regular{% endif %} fa-bookmark me-2" aria-hidden="true"></i>{% if is_saved %}Saved job{% else %}Save job{% endif %}</button></form>
+      {% elif not user.is_authenticated %}<a class="btn btn-primary rounded-pill w-100" href="{% url 'login' %}?next={{ request.path|urlencode }}">Sign in to apply</a>{% endif %}
+      {% if employer_application_url %}<a class="btn btn-link w-100 mt-2" href="{{ employer_application_url }}" target="_blank" rel="noopener noreferrer">Employer application page ↗</a>{% endif %}
+      <button class="btn btn-outline-secondary rounded-pill w-100 mt-2" type="button" data-share-job>Share job</button>
+      <button class="btn btn-link w-100 mt-1" type="button" data-copy-job-link>Copy job link</button>
+      <p class="small mt-2 mb-0" data-share-feedback role="status" aria-live="polite"></p>
+    </div>
+    {% if user.is_authenticated and user_role == 'seeker' %}
+      <div class="panel mt-3">
+        <p class="muted small mb-2">Was this recommendation relevant?</p>
+        <form class="mb-2" method="post" action="{% if is_dataset %}{% url 'recommendation_feedback' 'dataset' job_key %}{% else %}{% url 'recommendation_feedback' 'database' job.id %}{% endif %}">{% csrf_token %}<input type="hidden" name="next" value="{{ request.path }}"><button class="btn btn-sm btn-outline-primary rounded-pill" type="submit" name="reason" value="relevant">Relevant</button></form>
+        <form method="post" action="{% if is_dataset %}{% url 'recommendation_feedback' 'dataset' job_key %}{% else %}{% url 'recommendation_feedback' 'database' job.id %}{% endif %}">{% csrf_token %}<input type="hidden" name="next" value="{{ request.path }}"><label class="form-label small" for="feedback-reason">Help improve future matches</label><select class="form-select form-select-sm mb-2" id="feedback-reason" name="reason" required><option value="">Choose a reason</option><option value="not_relevant">Not relevant</option><option value="wrong_category">Wrong job category</option><option value="skills_mismatch">Skills do not match</option><option value="experience_mismatch">Experience does not match</option><option value="not_interested">Not interested</option></select><button class="btn btn-sm btn-outline-secondary rounded-pill" type="submit">Send feedback</button></form>
+      </div>
+    {% endif %}
+  </aside>
+</div>
+{% endblock %}

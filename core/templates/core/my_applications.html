@@ -1,0 +1,25 @@
+{% extends 'core/base.html' %}
+{% block title %}Application tracker{% endblock %}
+{% block content %}
+<section class="page-hero"><div class="container"><div class="eyebrow">YOUR JOB SEARCH</div><h1>My applications</h1><p class="muted">Follow each application from submission to decision.</p></div></section>
+<div class="container page-content"><div class="panel">
+{% for app in applications %}
+<article class="application-row align-items-start">
+  <div class="flex-grow-1">
+    <div class="d-flex flex-wrap align-items-center gap-2"><h2 class="h5 mb-0">{{ app.display_title }}</h2><span class="status status-{{ app.status }}">{% if app.source == 'dataset' %}Saved to tracker{% else %}{{ app.get_status_display }}{% endif %}</span></div>
+    <p class="small mb-1">{{ app.display_company }} · {{ app.get_source_display }} · Match {{ app.match_score|floatformat:0 }}%</p>
+    {% if app.source == 'dataset' %}<p class="small muted">Imported listing: this is a personal tracker entry, not confirmation that the employer received an application.{% if app.employer_application_url %} <a href="{{ app.employer_application_url }}" target="_blank" rel="noopener noreferrer">Continue on employer website ↗</a>{% endif %}</p>{% endif %}
+    <p class="small muted">Applied {{ app.created_at|date:"M d, Y H:i" }} · Updated {{ app.updated_at|date:"M d, Y H:i" }} · Ref {{ app.reference }}</p>
+    <div class="application-progress" role="progressbar" aria-label="Application stages completed" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ app.progress_percent }}"><span style="width: {{ app.progress_percent }}%"></span></div>
+    <ol class="application-timeline" aria-label="Application progress">
+      {% for step in app.timeline_steps %}<li class="application-timeline__step{% if step.reached %} is-reached{% endif %}{% if step.current %} is-current{% endif %}{% if step.status == 'rejected' %} is-rejected{% elif step.status == 'withdrawn' %} is-withdrawn{% endif %}"><span class="application-timeline__marker" aria-hidden="true"></span><span>{{ step.label }}</span>{% if step.changed_at %}<time datetime="{{ step.changed_at|date:'c' }}">{{ step.changed_at|date:"M d, Y H:i" }}</time>{% endif %}</li>{% endfor %}
+    </ol>
+    {% if app.interviews.all %}{% for interview in app.interviews.all %}<section class="interview-summary mt-3"><b>Interview {{ interview.starts_at|date:"M d, Y H:i" }}</b><span>{{ interview.get_mode_display }}{% if interview.details %} · {{ interview.details }}{% endif %}</span>{% if interview.meeting_link %}<a href="{{ interview.meeting_link }}" target="_blank" rel="noopener noreferrer">Open meeting link</a>{% endif %}</section>{% endfor %}{% endif %}
+    <details class="mt-3"><summary class="small">Status history</summary><div class="small mt-2">{% for event in app.status_history.all %}<p class="mb-1"><b>{% if event.previous_status %}{{ event.get_previous_status_display }} → {% endif %}{{ event.get_status_display }}</b> · {{ event.changed_at|date:"M d, Y H:i" }}{% if event.changed_by %}<span> · Updated by {{ event.changed_by.get_full_name|default:event.changed_by.username }}</span>{% endif %}{% if event.description %}<span> · {{ event.description }}</span>{% endif %}{% if event.recruiter_remarks %}<span> · Recruiter message: {{ event.recruiter_remarks }}</span>{% endif %}</p>{% empty %}<p>Application submitted.</p>{% endfor %}</div></details>
+  </div>
+  {% if app.can_withdraw %}<form method="post" action="{% url 'withdraw_application' app.id %}" onsubmit="return confirm('Withdraw this application?');">{% csrf_token %}<button class="btn btn-sm btn-outline-primary" type="submit">Withdraw</button></form>{% endif %}
+</article>
+{% empty %}<p>No applications yet. <a href="{% url 'job_list' %}">Explore jobs</a></p>{% endfor %}
+{% if page_obj.paginator.num_pages > 1 %}<nav class="d-flex justify-content-center align-items-center gap-2 mt-4" aria-label="Application pages">{% if page_obj.has_previous %}<a class="btn btn-outline-primary rounded-pill" href="?page={{ page_obj.previous_page_number }}">Previous</a>{% endif %}<span class="muted">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>{% if page_obj.has_next %}<a class="btn btn-outline-primary rounded-pill" href="?page={{ page_obj.next_page_number }}">Next</a>{% endif %}</nav>{% endif %}
+</div></div>
+{% endblock %}

@@ -1,0 +1,56 @@
+{% extends "core/base.html" %}
+{% load static %}
+{% block title %}ATS Resume Builder{% endblock %}
+{% block content %}
+<section class="page-hero"><div class="container"><div class="eyebrow">CAREER TOOLKIT</div><h1>Build a resume that reads clearly.</h1><p class="muted mb-0">Use your real experience and preview the layout as you edit. Your information is private to your account.</p></div></section>
+<div class="container page-content resume-builder-workspace">
+  <form class="resume-builder-form" method="post" novalidate data-resume-builder data-submit-once>
+    {% csrf_token %}
+    {% if form.non_field_errors %}<div class="alert alert-danger" role="alert">{{ form.non_field_errors }}</div>{% endif %}
+    {% for group in resume_form_groups %}
+      <section class="panel resume-form-section">
+        <div class="section-kicker">RESUME CONTENT</div><h2>{{ group.title }}</h2>
+        <div class="row g-3">
+          {% for field in group.fields %}
+            <div class="col-12{% if field.name == 'full_name' or field.name == 'email' or field.name == 'phone' or field.name == 'target_job_title' or field.name == 'city_state' %} col-md-6{% endif %}">
+              <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+              {{ field }}
+              {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
+              {% if field.name == "experience" or field.name == "projects" or field.name == "education" or field.name == "certifications" %}<div class="form-text">Separate entries with a new line. Add only details that are accurate.</div>{% endif %}
+              {% for error in field.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+            </div>
+          {% endfor %}
+        </div>
+      </section>
+    {% endfor %}
+    <div class="resume-submit-bar"><button class="btn btn-primary rounded-pill px-4" type="submit" data-submit-label="Generate PDF preview">Generate PDF preview</button><span class="muted small">The downloadable PDF is generated from these saved details.</span></div>
+  </form>
+
+  <aside class="resume-live-preview-wrap">
+    <section class="panel resume-quality-panel">
+      <div class="d-flex justify-content-between align-items-center"><h2>Resume quality</h2><strong>{{ resume_completeness }}%</strong></div>
+      <div class="progress mt-2" role="progressbar" aria-label="Resume completeness" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ resume_completeness }}"><div class="progress-bar" style="width:{{ resume_completeness }}%"></div></div>
+      <ul class="resume-quality-checks mt-3">{% for label, complete in resume_quality_checks %}<li class="{% if complete %}is-complete{% else %}is-missing{% endif %}"><span aria-hidden="true">{% if complete %}✓{% else %}○{% endif %}</span>{{ label }}{% if not complete %}<small>Not added</small>{% endif %}</li>{% endfor %}</ul>
+      <p class="small mb-1"><strong>Project tip:</strong> Include the project, tools used, your contribution, and an outcome when those details are accurate.</p>
+      <p class="muted small mb-0"><strong>ATS tip:</strong> Keep standard section headings and plain text entries; avoid tables and decorative charts in the downloadable resume.</p>
+    </section>
+    <div class="resume-live-preview-heading"><div><div class="section-kicker">LIVE PREVIEW</div><h2>Resume page</h2></div><span class="badge-soft">A4 · ATS-friendly</span></div>
+    <article class="resume-live-page" data-resume-live-preview>
+      <header class="resume-live-header">
+        <h1 data-resume-preview="full_name">{{ form.full_name.value|default:"Your name" }}</h1>
+        <p data-resume-preview="target_job_title">{{ form.target_job_title.value }}</p>
+        <div class="resume-live-contact">
+          <span data-resume-preview="email">{{ form.email.value }}</span><span data-resume-preview="phone">{{ form.phone.value }}</span><span data-resume-preview="city_state">{{ form.city_state.value }}</span>
+        </div>
+        <div class="resume-live-contact"><span data-resume-preview="linkedin">{{ form.linkedin.value }}</span><span data-resume-preview="github">{{ form.github.value }}</span><span data-resume-preview="portfolio">{{ form.portfolio.value }}</span></div>
+      </header>
+      {% for pair in resume_preview_sections %}
+        <section class="resume-live-section">
+          <h2>{{ pair.0 }}</h2><p data-resume-preview="{{ pair.1 }}" class="resume-live-copy">{% if pair.1 == "professional_summary" %}{{ form.professional_summary.value }}{% elif pair.1 == "career_objective" %}{{ form.career_objective.value }}{% elif pair.1 == "technical_skills" %}{{ form.technical_skills.value }}{% elif pair.1 == "experience" %}{{ form.experience.value }}{% elif pair.1 == "projects" %}{{ form.projects.value }}{% elif pair.1 == "education" %}{{ form.education.value }}{% elif pair.1 == "certifications" %}{{ form.certifications.value }}{% elif pair.1 == "awards" %}{{ form.awards.value }}{% else %}{{ form.training.value }}{% endif %}</p>
+        </section>
+      {% endfor %}
+    </article>
+    <p class="muted small mt-3">The final PDF is generated from the saved version of this resume and opens automatically after generation.</p>
+  </aside>
+</div>
+{% endblock %}

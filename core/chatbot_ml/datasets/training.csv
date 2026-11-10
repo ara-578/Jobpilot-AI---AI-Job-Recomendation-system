@@ -1,0 +1,169 @@
+text,intent
+Hello there,greeting
+Hi JobPilot,greeting
+Good morning,greeting
+Hey can you help me,greeting
+Good evening assistant,greeting
+Hello I have a question,greeting
+Hi there how are you,greeting
+Can you help me today,greeting
+Find Python developer jobs,job_search
+Show me jobs for a data analyst,job_search
+Are there Django openings,job_search
+Search for machine learning roles,job_search
+List remote SQL jobs,job_search
+Find internships in data science,job_search
+Show open software engineer positions,job_search
+I am looking for React developer work,job_search
+Recommend jobs based on my resume,job_recommendation
+Which roles fit my skills and experience,job_recommendation
+Suggest suitable openings for me,job_recommendation
+What jobs match my profile,job_recommendation
+Can you find the best job for my background,job_recommendation
+Show jobs that suit my resume,job_recommendation
+I need personalized job recommendations,job_recommendation
+Match me with relevant positions,job_recommendation
+What skills did you extract from my resume,skill_analysis
+Show the skills listed in my resume,skill_analysis
+Can you analyze my technical skills,skill_analysis
+Which abilities were detected in my CV,skill_analysis
+Tell me what my resume says about my skills,skill_analysis
+List my extracted resume skills,skill_analysis
+What technologies do I know according to my resume,skill_analysis
+Summarize my candidate skills,skill_analysis
+Which skills are missing for the roles I want,missing_skills
+What skills should I add to match jobs,missing_skills
+Show gaps between my resume and a suitable job,missing_skills
+What requirements am I missing,missing_skills
+Compare my skills with job requirements,missing_skills
+Tell me what skills I lack for this role,missing_skills
+How can I close my skills gap,missing_skills
+Which job skills are absent from my CV,missing_skills
+How do I improve my ATS score,ats_help
+Explain my resume ATS score,ats_help
+What should I change to make my resume ATS friendly,ats_help
+Give me suggestions to improve my resume,ats_help
+How can I make my CV easier for ATS software to read,ats_help
+Why is my ATS score low,ats_help
+Can you help optimize my resume,ats_help
+What does my resume analysis recommend,ats_help
+What is my latest application status,application_status
+How many jobs have I applied to,application_status
+Show my application history,application_status
+Did any recruiter shortlist me,application_status
+Check the status of my job applications,application_status
+Do I have an interview scheduled,application_status
+Which application was updated most recently,application_status
+Tell me whether my applications are under review,application_status
+Show the jobs I saved,saved_jobs
+List my bookmarked jobs,saved_jobs
+Which positions did I save for later,saved_jobs
+I want to see my saved jobs,saved_jobs
+Display my job watchlist,saved_jobs
+What openings have I bookmarked,saved_jobs
+Show my favorites from the job board,saved_jobs
+Retrieve jobs I saved,saved_jobs
+Show my recruiter job postings,recruiter_jobs
+How many jobs have I posted,recruiter_jobs
+List my active vacancies,recruiter_jobs
+Which roles did my company publish,recruiter_jobs
+Show my open positions,recruiter_jobs
+How many applicants have my jobs received,recruiter_jobs
+Give me statistics for my job listings,recruiter_jobs
+List jobs I created,recruiter_jobs
+Show applicants for my Python job,recruiter_applicants
+How many people applied to my openings,recruiter_applicants
+List candidates who applied to my job,recruiter_applicants
+Which applicants are shortlisted for my positions,recruiter_applicants
+Show my latest job applicants,recruiter_applicants
+Find submitted applications for my listings,recruiter_applicants
+Tell me how many candidates applied,recruiter_applicants
+Show applicants for my company jobs,recruiter_applicants
+Find candidates with Django and SQL, candidate_search
+Search for people matching my developer job,candidate_search
+Which candidates fit my Python opening,candidate_search
+Recommend applicants for this vacancy,candidate_search
+Find suitable candidates for my job,candidate_search
+Show discoverable resumes that match this role,candidate_search
+Help me find a candidate with machine learning skills,candidate_search
+Match candidates to my posted job,candidate_search
+How does JobPilot work,website_faq
+How can I create an account,website_faq
+Where do I upload my resume,website_faq
+How do I apply for a job,website_faq
+How do I use the resume builder,website_faq
+Can you explain the job recommendation feature,website_faq
+How can I contact support,website_faq
+What can I do on this website,website_faq
+Thanks goodbye,goodbye
+Thank you that is all,goodbye
+Bye for now,goodbye
+See you later,goodbye
+Goodbye assistant,goodbye
+Thanks for your help goodbye,goodbye
+I am done for today,goodbye
+Have a nice day,goodbye
+What is the capital of France,fallback
+Write me a poem about the ocean,fallback
+Tell me a joke,fallback
+Can you order dinner for me,fallback
+What will the weather be tomorrow,fallback
+Explain quantum physics in detail,fallback
+I need help with something unrelated,fallback
+That does not fit any of these categories,fallback
+Hello JobPilot Assistant,greeting
+Hi I need a little job search help,greeting
+Good afternoon assistant,greeting
+Hey there JobPilot,greeting
+Find recently posted jobs,job_search
+Show the newest active openings,job_search
+Find software jobs in Trivandrum,job_search
+Show internship openings in machine learning,job_search
+Find jobs matching my resume and skills,job_recommendation
+Which openings are most relevant to my experience,job_recommendation
+Help me choose roles that fit my profile,job_recommendation
+Recommend positions based on what I know,job_recommendation
+What technical abilities are in my uploaded CV,skill_analysis
+Show my resume's extracted technologies,skill_analysis
+Can you list my skills from the saved resume analysis,skill_analysis
+What competencies did the resume parser find,skill_analysis
+Compare my CV against the missing job requirements,missing_skills
+What should I learn to meet job requirements,missing_skills
+Which requirements are not covered by my resume,missing_skills
+Tell me the skills gaps for suitable openings,missing_skills
+Give me practical changes to improve ATS compatibility,ats_help
+What are my saved resume improvement tips,ats_help
+How can I make my resume score better,ats_help
+Explain the ATS analysis for my CV,ats_help
+Show my submitted applications and their status,application_status
+Tell me the status of my recent job applications,application_status
+How many applications are in review,application_status
+Do any of my applications have an interview date,application_status
+Show jobs in my saved list,saved_jobs
+Retrieve my saved listings,saved_jobs
+Open the jobs I bookmarked,saved_jobs
+What jobs did I keep for later,saved_jobs
+List the active roles I posted as a recruiter,recruiter_jobs
+Show the jobs in my recruiter account,recruiter_jobs
+Which of my listings are still open,recruiter_jobs
+Show my published vacancies with applicant counts,recruiter_jobs
+How many candidates applied to my job listings,recruiter_applicants
+Show applicants for my active listings,recruiter_applicants
+Which of my applicants are shortlisted,recruiter_applicants
+List the people who applied to my openings,recruiter_applicants
+Find applicants with Python skills for my job,candidate_search
+Which discoverable candidates fit my Python opening,candidate_search
+Search candidates for a Django developer vacancy,candidate_search
+Recommend a candidate for the job I posted,candidate_search
+How can I verify my email,website_faq
+Where is the resume analysis page,website_faq
+Can a recruiter manage applicants here,website_faq
+How do job seekers save a listing,website_faq
+I appreciate your help,goodbye
+Thanks I will check back later,goodbye
+That answers my question bye,goodbye
+See you soon assistant,goodbye
+What is a good recipe for pasta,fallback
+Can you translate this unrelated sentence,fallback
+Tell me tomorrow's lottery numbers,fallback
+Help me plan a vacation,fallback

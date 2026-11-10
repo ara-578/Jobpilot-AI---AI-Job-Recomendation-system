@@ -1,0 +1,49 @@
+{% extends 'core/base.html' %}
+{% block title %}Manage applications{% endblock %}
+{% block content %}
+<section class="page-hero"><div class="container"><div class="eyebrow">RECRUITER STUDIO</div><h1>Manage applications</h1><p class="muted">Review applicants for jobs you own, and move each application through a clear status workflow.</p></div></section>
+<div class="container page-content"><div class="panel">
+<form method="get" class="row g-2 align-items-end mb-4" aria-label="Filter applications">
+  <div class="col-md-3"><label class="form-label" for="filter-job">Job</label><select class="form-select" id="filter-job" name="job"><option value="">All jobs</option>{% for job in jobs %}<option value="{{ job.id }}" {% if filters.job == job.id|stringformat:"s" %}selected{% endif %}>{{ job.title }}</option>{% endfor %}</select></div>
+  <div class="col-md-2"><label class="form-label" for="filter-status">Status</label><select class="form-select" id="filter-status" name="status"><option value="">All statuses</option>{% for value,label in status_choices %}<option value="{{ value }}" {% if filters.status == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></div>
+  <div class="col-md-2"><label class="form-label" for="filter-from">From</label><input class="form-control" id="filter-from" type="date" name="date_from" value="{{ filters.date_from }}"></div>
+  <div class="col-md-2"><label class="form-label" for="filter-to">To</label><input class="form-control" id="filter-to" type="date" name="date_to" value="{{ filters.date_to }}"></div>
+  <div class="col-md-2"><label class="form-label" for="filter-skills">Skill</label><input class="form-control" id="filter-skills" name="skills" value="{{ filters.skills }}" placeholder="Python"></div>
+  <div class="col-md-1"><label class="form-label" for="filter-match">Min match</label><input class="form-control" id="filter-match" type="number" min="0" max="100" name="min_match" value="{{ filters.min_match }}"></div>
+  <div class="col-12 d-flex gap-2"><button class="btn btn-primary" type="submit">Filter</button><a class="btn btn-outline-secondary" href="{% url 'recruiter_applications' %}">Clear</a></div>
+</form>
+{% for app in applications %}
+<article class="application-row align-items-start"><div class="flex-grow-1">
+  <b>{{ app.applicant.get_full_name|default:app.applicant.username }}</b>
+  <span class="status status-{{ app.status }} ms-2">{{ app.get_status_display }}</span>
+  <small>{{ app.job.title }} · {{ app.job.company }} · {{ app.applicant_email|default:app.applicant.email }} · Match {{ app.match_score|floatformat:0 }}% · Applied {{ app.created_at|date:"M d, Y" }} · Ref {{ app.reference|truncatechars:13 }}</small>
+  {% if app.resume or app.uploaded_resume %}<a class="small d-block mt-1" href="{% url 'application_resume_download' app.id %}">Open application resume</a>{% endif %}
+  <div class="small mt-2"><b>Contact:</b> {{ app.applicant_phone|default:"Not provided" }} · {{ app.applicant_location|default:"Location not provided" }}</div>
+  <div class="small"><b>Current role:</b> {{ app.current_job_title|default:"Not provided" }} · {{ app.experience_years|default:"Not provided" }} years · {{ app.highest_qualification|default:"Qualification not provided" }}{% if app.graduation_year %} · {{ app.graduation_year }}{% endif %}</div>
+  <div class="small"><b>Skills:</b> {{ app.technical_skills|default:"Not provided" }}{% if app.certifications %} · <b>Certifications:</b> {{ app.certifications }}{% endif %}</div>
+  {% if app.expected_salary or app.notice_period or app.preferred_work_mode %}<div class="small"><b>Preferences:</b> {{ app.expected_salary|default:"Salary not stated" }} · {{ app.notice_period|default:"Notice period not stated" }} · {{ app.get_preferred_work_mode_display|default:"Work mode not stated" }}</div>{% endif %}
+  {% if app.portfolio_url or app.linkedin_url or app.github_url %}<div class="small d-flex flex-wrap gap-2">{% if app.portfolio_url %}<a href="{{ app.portfolio_url }}" target="_blank" rel="noopener noreferrer">Portfolio</a>{% endif %}{% if app.linkedin_url %}<a href="{{ app.linkedin_url }}" target="_blank" rel="noopener noreferrer">LinkedIn</a>{% endif %}{% if app.github_url %}<a href="{{ app.github_url }}" target="_blank" rel="noopener noreferrer">GitHub</a>{% endif %}</div>{% endif %}
+  {% if app.cover_letter %}<p class="small preserve-lines mt-2"><b>Cover letter</b><br>{{ app.cover_letter }}</p>{% endif %}
+  {% if app.why_suitable %}<p class="small preserve-lines mt-2"><b>Why suitable</b><br>{{ app.why_suitable }}</p>{% endif %}
+  {% if app.additional_info %}<p class="small preserve-lines mt-2"><b>Additional information</b><br>{{ app.additional_info }}</p>{% endif %}
+  {% if app.recruiter_notes %}<details class="small mt-2"><summary>Private recruiter notes</summary><p class="preserve-lines">{{ app.recruiter_notes }}</p></details>{% endif %}
+  <div class="small mt-2"><b>History</b>{% for event in app.status_history.all %}<div>{{ event.get_status_display }} · {{ event.changed_at|date:"M d, Y H:i" }}</div>{% empty %}<div>Application submitted</div>{% endfor %}</div>
+</div>
+{% if app.allowed_statuses %}
+<form method="post" action="{% url 'update_application_status' app.id %}" class="status-form" onsubmit="return confirm('Save this application update?');">{% csrf_token %}
+  <label class="form-label" for="status-{{ app.id }}">Update status</label>
+  <select id="status-{{ app.id }}" name="status" class="form-select form-select-sm mb-2">{% for value,label in app.allowed_statuses %}<option value="{{ value }}">{{ label }}</option>{% endfor %}</select>
+  <label class="form-label small" for="interview-{{ app.id }}">Interview date and time</label><input class="form-control form-control-sm mb-2" id="interview-{{ app.id }}" type="datetime-local" name="interview_at">
+  <label class="form-label small" for="mode-{{ app.id }}">Interview mode</label><select class="form-select form-select-sm mb-2" id="mode-{{ app.id }}" name="interview_mode"><option value="">Choose mode</option><option value="onsite">On-site</option><option value="phone">Phone</option><option value="video">Video</option></select>
+  <label class="form-label small" for="link-{{ app.id }}">Meeting link</label><input class="form-control form-control-sm mb-2" id="link-{{ app.id }}" type="url" name="interview_link">
+  <label class="form-label small" for="details-{{ app.id }}">Interview details</label><textarea class="form-control form-control-sm mb-2" id="details-{{ app.id }}" name="interview_details" rows="2"></textarea>
+  <label class="form-label small" for="notes-{{ app.id }}">Private recruiter notes</label><textarea class="form-control form-control-sm mb-2" id="notes-{{ app.id }}" name="recruiter_notes" rows="3">{{ app.recruiter_notes }}</textarea>
+  <label class="form-label small" for="candidate-remarks-{{ app.id }}">Message for candidate (optional)</label><textarea class="form-control form-control-sm mb-2" id="candidate-remarks-{{ app.id }}" name="candidate_remarks" rows="2"></textarea>
+  <button class="btn btn-sm btn-primary" type="submit">Save update</button>
+</form>
+{% endif %}
+</article>
+{% empty %}<p>No applications match these filters.</p>{% endfor %}
+{% if page_obj.paginator.num_pages > 1 %}<nav class="d-flex justify-content-center align-items-center gap-2 mt-4" aria-label="Application pages">{% if page_obj.has_previous %}<a class="btn btn-outline-primary rounded-pill" href="?{{ request.GET.urlencode }}&page={{ page_obj.previous_page_number }}">Previous</a>{% endif %}<span class="muted">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>{% if page_obj.has_next %}<a class="btn btn-outline-primary rounded-pill" href="?{{ request.GET.urlencode }}&page={{ page_obj.next_page_number }}">Next</a>{% endif %}</nav>{% endif %}
+</div></div>
+{% endblock %}

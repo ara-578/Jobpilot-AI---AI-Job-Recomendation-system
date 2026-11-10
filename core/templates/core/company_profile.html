@@ -1,0 +1,26 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% block title %}{{ company_name }} · Company profile{% endblock %}
+{% block content %}
+<section class="page-hero">
+  <div class="container">
+    <div class="eyebrow">EMPLOYER PROFILE</div>
+    <div class="company-profile-heading">
+      {% if logo_job and logo_job.company_logo %}      <img class="company-logo company-logo-large" src="{{ logo_job.company_logo.url }}" data-fallback-src="{% static 'images/companies/default_company.svg' %}" alt="{{ company_name }} logo" width="72" height="72" loading="lazy">{% else %}<img class="company-logo company-logo-large" src="{% static 'images/companies/default_company.svg' %}" alt="" width="72" height="72">{% endif %}
+      <div><h1>{{ company_name }}</h1><p class="muted mb-1">{{ company_profile.company_industry|default:"Industry not specified" }}{% if company_profile.location %} · {{ company_profile.location }}{% endif %}</p>{% if company_profile.company_website %}<a href="{{ company_profile.company_website }}" target="_blank" rel="noopener noreferrer">Visit company website ↗</a>{% endif %}</div>
+      {% if user.is_authenticated and user.pk == company_profile.user_id and user_role == 'recruiter' %}<a class="btn btn-outline-primary rounded-pill ms-auto" href="{% url 'profile' %}">Edit company profile</a>{% endif %}
+    </div>
+  </div>
+</section>
+<div class="container page-content">
+  <div class="row g-4">
+    <main class="col-lg-8">
+      <section class="panel"><div class="section-kicker">ABOUT</div><h2>About {{ company_name }}</h2><p class="preserve-lines mb-0">{{ company_profile.company_description|default:"Company information has not been added yet." }}</p></section>
+      <section class="mt-4"><div class="d-flex justify-content-between align-items-center mb-3"><div><div class="eyebrow">OPEN POSITIONS</div><h2>Current vacancies</h2></div><span class="badge-soft">{{ jobs|length }} open</span></div>
+        <div class="row g-3">{% for job in jobs %}<div class="col-md-6"><article class="job-card h-100"><h3 class="h5"><a href="{% url 'job_detail' job.pk %}">{{ job.title }}</a></h3><p>{{ job.location|default:"Location flexible" }} · {{ job.get_work_mode_display }}</p><div class="skill-cloud"><span>{{ job.employment_type }}</span>{% if job.salary %}<span>{{ job.salary }}</span>{% endif %}</div><a class="btn btn-outline-primary rounded-pill mt-3" href="{% url 'job_detail' job.pk %}">View vacancy</a></article></div>{% empty %}<div class="col-12"><div class="empty-state"><h3>No active vacancies</h3><p class="mb-0">This company has no current openings.</p></div></div>{% endfor %}</div>
+      </section>
+    </main>
+    <aside class="col-lg-4"><div class="panel"><div class="section-kicker">COMPANY INFORMATION</div><dl class="company-facts"><dt>Industry</dt><dd>{{ company_profile.company_industry|default:"Not specified" }}</dd><dt>Location</dt><dd>{{ company_profile.location|default:"Not specified" }}</dd><dt>Website</dt><dd>{% if company_profile.company_website %}<a href="{{ company_profile.company_website }}" target="_blank" rel="noopener noreferrer">{{ company_profile.company_website }}</a>{% else %}Not provided{% endif %}</dd><dt>Active vacancies</dt><dd>{{ jobs|length }}</dd></dl></div></aside>
+  </div>
+</div>
+{% endblock %}

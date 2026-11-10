@@ -1,0 +1,27 @@
+{% extends 'core/base.html' %}
+{% block title %}Admin job management{% endblock %}
+{% block content %}
+<section class="page-hero"><div class="container">
+  <div class="eyebrow">SECURE ADMINISTRATION</div>
+  <h1>Manage job listings</h1>
+  <p class="muted">Create, edit, activate, close, fill, or remove database-backed jobs.</p>
+  <a class="btn btn-primary rounded-pill mt-3" href="{% url 'administration_job_create' %}">＋ Add job</a>
+</div></section>
+<div class="container page-content"><div class="row g-3">
+  {% for job in jobs %}
+  <div class="col-lg-6"><article class="job-card h-100">
+    <div class="job-card-top"><div><h4>{{ job.title }}</h4><p>{{ job.company }} · {{ job.location|default:"Location not specified" }}</p></div><span class="badge-soft">{{ job.get_status_display }}</span></div>
+    <p class="muted small">Updated {{ job.updated_at|date:"M d, Y H:i" }} · {{ job.applications.count }} applications · Owner {{ job.recruiter.username }}</p>
+    <div class="d-flex flex-wrap align-items-center gap-2">
+      <a class="btn btn-sm btn-outline-primary rounded-pill" href="{% url 'administration_job_edit' job.pk %}">Edit</a>
+      <form method="post" action="{% url 'administration_job_status' job.pk %}" class="d-flex gap-2">{% csrf_token %}
+        <label class="visually-hidden" for="status-{{ job.pk }}">Job status</label>
+        <select class="form-select form-select-sm" id="status-{{ job.pk }}" name="status">{% for value,label in job.STATUS_CHOICES %}<option value="{{ value }}" {% if job.status == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select>
+        <button class="btn btn-sm btn-outline-primary rounded-pill" type="submit">Update status</button>
+      </form>
+      <form method="post" action="{% url 'administration_job_delete' job.pk %}" onsubmit="return confirm('Delete this job and its related applications?');">{% csrf_token %}<button class="btn btn-sm btn-outline-danger rounded-pill" type="submit">Delete</button></form>
+    </div>
+  </article></div>
+  {% empty %}<div class="col-12"><div class="panel"><h3>No database jobs yet</h3><p class="muted">Add a job here and it will appear in unified search and resume recommendations immediately.</p><a class="btn btn-primary rounded-pill" href="{% url 'administration_job_create' %}">Create the first job</a></div></div>{% endfor %}
+</div></div>
+{% endblock %}
