@@ -1,4 +1,4 @@
-# JobPilot AI — Django starter
+# JobPilot AI 
 
 A Django recruitment application with a supplied recommendation bundle and a separate BiLSTM training notebook.
 
